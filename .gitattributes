@@ -1,0 +1,4 @@
+# Linguist overrides
+*.ipynb linguist-documentation=false
+*.md linguist-documentation
+pixi.lock linguist-generated=true

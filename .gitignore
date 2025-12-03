@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Data
+data/raw/*
+data/processed/*
+!data/.gitkeep
+
+# Models
+models/*.pkl
+models/*.h5
+!models/.gitkeep
+
+# Results
+results/*.png
+results/*.csv
+!results/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+# pixi environment
+.pixi/

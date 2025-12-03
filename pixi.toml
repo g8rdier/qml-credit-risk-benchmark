@@ -1,0 +1,90 @@
+# pixi.toml - Modern package management for QML Credit Risk Benchmark
+# pixi uses conda-forge for better binary compatibility with scientific packages
+
+[workspace]
+name = "qml-credit-risk-benchmark"
+version = "0.1.0"
+description = "Empirical comparison of Quantum vs Classical SVMs on credit risk data (BI2 Project)"
+authors = ["Gregor Kobilarov"]
+# Specify which platforms this project supports (add more if needed)
+channels = ["conda-forge"]  # conda-forge has pre-built binaries for scientific packages
+platforms = ["linux-64"]    # Add "osx-64", "osx-arm64", "win-64" if collaborating cross-platform
+
+# Core dependencies
+# These will be installed from conda-forge (faster, better binaries than pip)
+[dependencies]
+python = "3.11.*"           # Pin to 3.11.x for stability (latest stable for scientific computing)
+
+# Core Data Science Stack
+pandas = ">=2.0.0"          # DataFrames for data manipulation
+numpy = ">=1.24.0"          # Numerical computing foundation
+scikit-learn = ">=1.3.0"    # Classical machine learning (our SVM baseline)
+
+# Visualization
+matplotlib = ">=3.7.0"      # Plotting library (confusion matrix, ROC curves)
+seaborn = ">=0.12.0"        # Statistical visualization (built on matplotlib)
+
+# Quantum Computing (Phase 3)
+qiskit = ">=0.45.0"                    # IBM's quantum computing framework
+qiskit-machine-learning = ">=0.7.0"    # Quantum ML algorithms (QSVM)
+
+# Utilities
+python-dotenv = ">=1.0.0"   # Environment variable management
+tqdm = ">=4.65.0"           # Progress bars for long-running operations
+kagglehub = ">=0.3.13,<0.4"
+
+# Development tools (optional, but recommended)
+[feature.dev.dependencies]
+jupyter = ">=1.0.0"         # Interactive notebooks
+ipykernel = ">=6.25.0"      # Jupyter kernel for Python
+ipywidgets = ">=8.0.0"      # Interactive widgets in notebooks
+pytest = ">=7.4.0"          # Testing framework
+pytest-cov = ">=4.1.0"      # Code coverage for tests
+ruff = ">=0.1.0"            # Ultra-fast Python linter (Rust-based)
+black = ">=23.0.0"          # Code formatter
+
+# Environments - define different configurations
+[environments]
+# Default environment (production-ready)
+default = { solve-group = "default" }
+# Development environment (includes testing and notebook tools)
+dev = { features = ["dev"], solve-group = "default" }
+
+# Task definitions - these are shortcuts for common commands
+# Run with: pixi run <task-name>
+[tasks]
+# Installation and setup
+test-install = "python test_installation.py"
+setup = { cmd = "python -c 'from pathlib import Path; [Path(d).mkdir(parents=True, exist_ok=True) for d in [\"data/raw\", \"data/processed\", \"models\", \"results\"]]'", description = "Create necessary directories" }
+
+# Classical SVM tasks
+run-classical = { cmd = "python main.py --mode classical", description = "Run classical SVM pipeline with default settings" }
+run-classical-4 = { cmd = "python main.py --mode classical --n-components 4", description = "Run with 4 PCA components (4 qubits)" }
+run-classical-8 = { cmd = "python main.py --mode classical --n-components 8", description = "Run with 8 PCA components (8 qubits)" }
+compare-kernels = { cmd = "python main.py --mode classical --compare-kernels", description = "Compare different SVM kernels" }
+
+# Quantum SVM tasks (for Phase 3)
+run-quantum = { cmd = "python main.py --mode quantum", description = "Run quantum SVM pipeline (Phase 3)" }
+compare = { cmd = "python main.py --mode compare", description = "Run both classical and quantum, then compare" }
+
+# Notebook tasks
+notebook = { cmd = "jupyter notebook notebooks/01_classical_svm_exploration.ipynb", description = "Open classical SVM exploration notebook" }
+notebook-server = { cmd = "jupyter notebook", description = "Start Jupyter notebook server" }
+
+# Data tasks
+download-data = { cmd = "python -c 'from src.data_loader import CreditDataLoader; loader = CreditDataLoader(); loader.load_from_openml(); loader.save_raw_data()'", description = "Download and cache dataset" }
+
+# Development tasks
+lint = { cmd = "ruff check src/", description = "Run linter on source code" }
+format = { cmd = "black src/", description = "Format code with black" }
+test = { cmd = "pytest tests/ -v", description = "Run test suite" }
+
+# Cleanup
+clean = { cmd = "rm -rf models/*.pkl results/*.png data/raw/*.csv", description = "Remove generated files" }
+
+# Combined workflows
+full-pipeline = { depends-on = ["setup", "download-data", "run-classical"], description = "Complete pipeline from scratch" }
+
+# Development environment activation
+[feature.dev.tasks]
+dev-setup = { cmd = "pip install -e .", description = "Install package in editable mode for development" }
