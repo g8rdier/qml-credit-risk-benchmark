@@ -418,7 +418,7 @@ if __name__ == "__main__":
     print("🚀 Testing Quantum SVM Module\n")
 
     # Load and preprocess data
-    X, y = load_credit_data("kaggle")
+    X, y = load_credit_data("openml")
     preprocessor = CreditDataPreprocessor(n_components=4)
     X_train, X_test, y_train, y_test = preprocessor.preprocess_data(X, y)
 

@@ -118,7 +118,7 @@ def run_quantum_pipeline(n_components: int = 4) -> dict:
     # Step 1: Load Data
     print("\n📥 STEP 1: Loading Data")
     print("-" * 80)
-    X, y = load_credit_data("kaggle")
+    X, y = load_credit_data("openml")
 
     # Step 2: Preprocess Data
     print("\n🔧 STEP 2: Preprocessing Data")
