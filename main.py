@@ -107,24 +107,63 @@ def run_quantum_pipeline(n_components: int = 4) -> dict:
 
     Returns:
         Dictionary with results and metrics
-
-    Note:
-        This is a placeholder for the quantum implementation.
-        Will be implemented using Qiskit/PennyLane in the next phase.
     """
     print("\n" + "="*80)
     print("QUANTUM SVM PIPELINE")
     print("="*80)
-    print("\n⚠️  Quantum SVM implementation is in progress.")
-    print("    This will use Qiskit's QSVM with a quantum kernel.")
-    print(f"    Target: {n_components}-qubit implementation")
-    print("\n📝 TODO:")
-    print("    1. Implement quantum feature map")
-    print("    2. Implement quantum kernel estimation")
-    print("    3. Integrate with sklearn SVC via custom kernel")
-    print("    4. Benchmark against classical SVM")
 
-    return {}
+    # Import quantum module
+    from quantum_svm import QuantumKernelSVM
+
+    # Step 1: Load Data
+    print("\n📥 STEP 1: Loading Data")
+    print("-" * 80)
+    X, y = load_credit_data("kaggle")
+
+    # Step 2: Preprocess Data
+    print("\n🔧 STEP 2: Preprocessing Data")
+    print("-" * 80)
+    preprocessor = CreditDataPreprocessor(n_components=n_components)
+    X_train, X_test, y_train, y_test = preprocessor.preprocess_data(X, y)
+
+    # Save preprocessor for reproducibility
+    preprocessor.save_preprocessor()
+
+    # Step 3: Train Quantum SVM
+    print("\n⚛️  STEP 3: Training Quantum SVM")
+    print("-" * 80)
+    qsvm = QuantumKernelSVM(
+        n_qubits=n_components,
+        feature_map_reps=2,
+        entanglement='linear'
+    )
+    qsvm.train(X_train, y_train)
+
+    # Step 4: Evaluate
+    print("\n📊 STEP 4: Evaluating Model")
+    print("-" * 80)
+    metrics = qsvm.evaluate(X_test, y_test, X_train)
+
+    # Step 5: Generate Reports and Visualizations
+    print("\n📈 STEP 5: Generating Reports")
+    print("-" * 80)
+    qsvm.generate_classification_report(X_test, y_test, X_train)
+    qsvm.plot_confusion_matrix(X_test, y_test, X_train)
+
+    # Step 6: Save Model
+    qsvm.save_model()
+
+    print("\n✅ Quantum SVM pipeline completed successfully!")
+
+    return {
+        'model': qsvm,
+        'metrics': metrics,
+        'preprocessor': preprocessor,
+        'X_train': X_train,
+        'X_test': X_test,
+        'y_train': y_train,
+        'y_test': y_test
+    }
 
 
 def run_comparison(n_components: int = 4) -> None:
