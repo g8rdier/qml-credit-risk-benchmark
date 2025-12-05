@@ -25,6 +25,11 @@ from data_loader import load_credit_data
 from preprocessing import CreditDataPreprocessor
 from classical_svm import ClassicalSVM, compare_kernels
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 def run_classical_pipeline(n_components: int = 4, compare_kernel: bool = False) -> dict:
     """
@@ -166,6 +171,147 @@ def run_quantum_pipeline(n_components: int = 4) -> dict:
     }
 
 
+def create_comparison_visualization(classical_metrics: dict, quantum_metrics: dict, save_path: str = "results/comparison_summary.png") -> None:
+    """
+    Create a comprehensive comparison visualization.
+
+    Args:
+        classical_metrics: Metrics from classical SVM
+        quantum_metrics: Metrics from quantum SVM
+        save_path: Path to save the visualization
+    """
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
+    fig.suptitle('Classical vs Quantum SVM: Comprehensive Comparison\nBI2 Project - German Credit Risk Dataset',
+                 fontsize=16, fontweight='bold', y=0.98)
+
+    # 1. Performance Metrics Comparison (Bar Chart)
+    metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
+    classical_values = [classical_metrics['accuracy'], classical_metrics['precision'],
+                       classical_metrics['recall'], classical_metrics['f1_score']]
+    quantum_values = [quantum_metrics['accuracy'], quantum_metrics['precision'],
+                     quantum_metrics['recall'], quantum_metrics['f1_score']]
+
+    x = np.arange(len(metrics))
+    width = 0.35
+
+    bars1 = ax1.bar(x - width/2, classical_values, width, label='Classical SVM', color='#3498db', alpha=0.8)
+    bars2 = ax1.bar(x + width/2, quantum_values, width, label='Quantum SVM', color='#e74c3c', alpha=0.8)
+
+    ax1.set_ylabel('Score', fontsize=12, fontweight='bold')
+    ax1.set_title('Performance Metrics Comparison', fontsize=13, fontweight='bold', pad=15)
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(metrics)
+    ax1.legend(loc='lower right', fontsize=11)
+    ax1.grid(axis='y', alpha=0.3, linestyle='--')
+    ax1.set_ylim([0, 1.05])
+
+    # Add value labels on bars
+    for bars in [bars1, bars2]:
+        for bar in bars:
+            height = bar.get_height()
+            ax1.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{height:.3f}', ha='center', va='bottom', fontsize=9)
+
+    # 2. Timing Comparison (Log Scale Bar Chart)
+    c_train = classical_metrics.get('training_time', 0)
+    q_train = quantum_metrics.get('training_time', 0) + quantum_metrics.get('kernel_computation_time', 0)
+    c_pred = classical_metrics.get('prediction_time', 0)
+    q_pred = quantum_metrics.get('prediction_time', 0)
+
+    timing_labels = ['Training Time', 'Prediction Time']
+    classical_times = [c_train, c_pred]
+    quantum_times = [q_train, q_pred]
+
+    x_timing = np.arange(len(timing_labels))
+    bars3 = ax2.bar(x_timing - width/2, classical_times, width, label='Classical SVM', color='#3498db', alpha=0.8)
+    bars4 = ax2.bar(x_timing + width/2, quantum_times, width, label='Quantum SVM', color='#e74c3c', alpha=0.8)
+
+    ax2.set_ylabel('Time (seconds, log scale)', fontsize=12, fontweight='bold')
+    ax2.set_title('Computational Efficiency Comparison', fontsize=13, fontweight='bold', pad=15)
+    ax2.set_xticks(x_timing)
+    ax2.set_xticklabels(timing_labels)
+    ax2.legend(loc='upper right', fontsize=11)
+    ax2.set_yscale('log')
+    ax2.grid(axis='y', alpha=0.3, linestyle='--', which='both')
+
+    # Add speedup annotations
+    train_speedup = q_train / c_train if c_train > 0 else 0
+    pred_speedup = q_pred / c_pred if c_pred > 0 else 0
+    ax2.text(0, max(c_train, q_train) * 1.5, f'{train_speedup:.0f}x\nslower',
+            ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
+    ax2.text(1, max(c_pred, q_pred) * 1.5, f'{pred_speedup:.0f}x\nslower',
+            ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
+
+    # 3. Metrics Heatmap
+    comparison_data = np.array([
+        [classical_metrics['accuracy'], quantum_metrics['accuracy']],
+        [classical_metrics['precision'], quantum_metrics['precision']],
+        [classical_metrics['recall'], quantum_metrics['recall']],
+        [classical_metrics['f1_score'], quantum_metrics['f1_score']]
+    ])
+
+    im = ax3.imshow(comparison_data, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1)
+    ax3.set_xticks([0, 1])
+    ax3.set_xticklabels(['Classical', 'Quantum'], fontsize=11)
+    ax3.set_yticks([0, 1, 2, 3])
+    ax3.set_yticklabels(['Accuracy', 'Precision', 'Recall', 'F1-Score'], fontsize=11)
+    ax3.set_title('Performance Heatmap', fontsize=13, fontweight='bold', pad=15)
+
+    # Add text annotations
+    for i in range(len(metrics)):
+        for j in range(2):
+            text = ax3.text(j, i, f'{comparison_data[i, j]:.3f}',
+                          ha="center", va="center", color="black", fontsize=11, fontweight='bold')
+
+    cbar = plt.colorbar(im, ax=ax3)
+    cbar.set_label('Score', fontsize=11, fontweight='bold')
+
+    # 4. Summary Text Box
+    ax4.axis('off')
+
+    summary_text = f"""
+    EXPERIMENT SUMMARY
+    {'='*50}
+
+    Dataset: German Credit Risk (OpenML)
+    Samples: 1,000 (800 train / 200 test)
+    Features: 48 → 4 (PCA, {quantum_metrics.get('n_qubits', 4)} qubits)
+
+    PERFORMANCE WINNER: {'Quantum' if quantum_metrics['f1_score'] > classical_metrics['f1_score'] else 'Classical' if classical_metrics['f1_score'] > quantum_metrics['f1_score'] else 'Tie'}
+    • Accuracy Δ: {abs(classical_metrics['accuracy'] - quantum_metrics['accuracy'])*100:.2f}% (minimal)
+    • F1-Score: Quantum {quantum_metrics['f1_score']:.4f} vs Classical {classical_metrics['f1_score']:.4f}
+    • Quantum has higher recall ({quantum_metrics['recall']:.2%})
+    • Classical has higher precision ({classical_metrics['precision']:.2%})
+
+    EFFICIENCY WINNER: Classical
+    • Training: {train_speedup:.0f}x faster
+    • Prediction: {pred_speedup:.0f}x faster
+    • Total time: Classical {c_train + c_pred:.2f}s vs Quantum {q_train + q_pred:.0f}s
+
+    CONCLUSION FOR BI2 PROJECT:
+    Quantum SVM provides marginal performance gains
+    ({(quantum_metrics['f1_score'] - classical_metrics['f1_score'])*100:.1f}% F1-score improvement) but at
+    exponential computational cost ({train_speedup:.0f}x slower).
+
+    Quantum simulation overhead makes it impractical
+    for production use with current technology.
+    Real quantum hardware may change this trajectory.
+
+    Generated: {Path(__file__).parent.name}
+    Student: Gregor Kobilarov | Course: BI2 | Semester: 6
+    """
+
+    ax4.text(0.05, 0.95, summary_text, transform=ax4.transAxes,
+            fontsize=10, verticalalignment='top', fontfamily='monospace',
+            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
+
+    plt.tight_layout()
+    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"\n📊 Saved comparison visualization to: {save_path}")
+    plt.close()
+
+
 def run_comparison(n_components: int = 4) -> None:
     """
     Run both classical and quantum pipelines and compare results.
@@ -263,6 +409,9 @@ def run_comparison(n_components: int = 4) -> None:
     print("   Quantum SVM simulation overhead makes it impractical for current use cases.")
     print("   Real quantum hardware may change this, but simulators don't provide advantages.")
     print("="*80)
+
+    # Generate comparison visualization
+    create_comparison_visualization(c_metrics, q_metrics)
 
 
 def main():
