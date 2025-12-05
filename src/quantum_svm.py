@@ -28,6 +28,8 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve
 )
+import matplotlib
+matplotlib.use('Agg')  # Non-interactive backend for server environments
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -343,7 +345,7 @@ class QuantumKernelSVM:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"📈 Saved confusion matrix to: {save_path}")
 
-        plt.show()
+        plt.close()  # Close figure to free memory
 
     def generate_classification_report(
         self,

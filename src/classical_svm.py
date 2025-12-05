@@ -19,6 +19,8 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve
 )
+import matplotlib
+matplotlib.use('Agg')  # Non-interactive backend for server environments
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
@@ -214,7 +216,7 @@ class ClassicalSVM:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"📈 Saved confusion matrix to: {save_path}")
 
-        plt.show()
+        plt.close()  # Close figure to free memory
 
     def plot_roc_curve(
         self,
@@ -251,7 +253,7 @@ class ClassicalSVM:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"📈 Saved ROC curve to: {save_path}")
 
-        plt.show()
+        plt.close()  # Close figure to free memory
 
     def generate_classification_report(self, X_test: np.ndarray, y_test: np.ndarray) -> str:
         """
