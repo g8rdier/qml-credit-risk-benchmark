@@ -25,7 +25,8 @@ matplotlib = ">=3.7.0"      # Plotting library (confusion matrix, ROC curves)
 seaborn = ">=0.12.0"        # Statistical visualization (built on matplotlib)
 
 # Quantum Computing (Phase 3)
-qiskit = ">=0.45.0"                    # IBM's quantum computing framework
+qiskit = ">=1.0,<2.0"                  # IBM's quantum computing framework (1.x for ML compatibility)
+qiskit-aer = ">=0.13.0"                # Aer quantum circuit simulator
 qiskit-machine-learning = ">=0.7.0"    # Quantum ML algorithms (QSVM)
 
 # Utilities
