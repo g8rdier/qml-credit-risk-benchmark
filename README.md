@@ -172,24 +172,52 @@ The project tracks the following metrics for comparison:
 | **Training Time** | Time to fit model | Computational cost |
 | **Prediction Time** | Time for inference | Deployment feasibility |
 
-## Expected Results
+## Experimental Results
 
-### Classical SVM (Baseline)
-- **Accuracy**: ~70-75% (typical for this dataset)
-- **Training Time**: < 1 second
-- **Best Kernel**: RBF (typically)
+### Performance Comparison
 
-### Quantum SVM (Hypothesis)
-- **Accuracy**: Similar to classical (±5%)
-- **Training Time**: Significantly higher (10-100x) due to simulation
-- **Advantage**: May improve with real quantum hardware
+| Metric | Classical SVM | Quantum SVM | Winner |
+|--------|---------------|-------------|---------|
+| **Accuracy** | 70.00% | 70.50% | Quantum (+0.5%) |
+| **Precision** | 75.00% | 70.77% | Classical |
+| **Recall** | 85.71% | 98.57% | Quantum |
+| **F1-Score** | 80.00% | 82.39% | Quantum (+2.4%) |
+
+### Computational Efficiency
+
+| Operation | Classical SVM | Quantum SVM | Speedup |
+|-----------|---------------|-------------|---------|
+| **Training** | 0.05s | 774.72s | Classical 15,494x faster |
+| **Prediction** | 0.003s | 409.40s | Classical 136,467x faster |
+| **Total Time** | 0.08s | 1,184.13s | Classical 14,801x faster |
+
+### Key Findings
+
+✅ **Performance**: Quantum achieves marginally better F1-score (2.4% improvement)
+✅ **Hypothesis Validated**: Similar accuracy to classical (~0.5% difference)
+❌ **Computational Cost**: Quantum is 14,801x slower due to simulation overhead
+⚠️ **Practical Conclusion**: Quantum simulation provides no practical advantage for production use
+
+**Trade-offs:**
+- **Quantum**: Exceptional recall (98.57%) - catches almost all good credits but with more false positives
+- **Classical**: Higher precision (75.00%) - more conservative, fewer false positives
+
+### Visualization
+
+![Comparison Summary](results/comparison_summary.png)
+
+The comprehensive comparison includes:
+- Performance metrics bar chart
+- Computational efficiency comparison (log scale)
+- Performance heatmap
+- Summary analysis for BI2 project
 
 ## Project Timeline
 
 - [x] **Phase 1**: Data loading and preprocessing
 - [x] **Phase 2**: Classical SVM benchmark
-- [ ] **Phase 3**: Quantum SVM implementation (In Progress)
-- [ ] **Phase 4**: Comparative analysis and visualization
+- [x] **Phase 3**: Quantum SVM implementation
+- [x] **Phase 4**: Comparative analysis and visualization
 - [ ] **Phase 5**: Final report and presentation
 
 ## Technical Notes
@@ -258,22 +286,17 @@ python src/classical_svm.py
 
 ## Future Work
 
-1. **Quantum SVM Implementation**
-   - Implement quantum feature map (ZZFeatureMap, ZFeatureMap)
-   - Quantum kernel estimation using Qiskit
-   - Integration with classical SVM via custom kernel
-
-2. **Hyperparameter Optimization**
+1. **Hyperparameter Optimization**
    - Grid search for C and gamma
    - Cross-validation
    - Automated kernel selection
 
-3. **Extended Comparison**
+2. **Extended Comparison**
    - Multiple datasets
    - Real quantum hardware (IBM Quantum, IonQ)
    - Comparison with other QML algorithms
 
-4. **Deployment**
+3. **Deployment**
    - REST API for model serving
    - Streamlit dashboard for visualization
    - Docker containerization
@@ -294,4 +317,4 @@ This project is for educational purposes as part of a university course.
 
 ---
 
-**Status**: Phase 2 Complete (Classical SVM) | Phase 3 In Progress (Quantum SVM)
+**Status**: Phase 4 Complete | Experimental Results Available | Final Report Pending
