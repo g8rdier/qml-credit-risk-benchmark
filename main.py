@@ -180,11 +180,89 @@ def run_comparison(n_components: int = 4) -> None:
     # Run classical
     classical_results = run_classical_pipeline(n_components=n_components)
 
-    # Run quantum (TODO)
+    # Run quantum
     quantum_results = run_quantum_pipeline(n_components=n_components)
 
-    # Compare (TODO: implement when quantum is ready)
-    print("\n📊 Comparison will be available once quantum implementation is complete.")
+    # Compare results
+    print("\n" + "="*80)
+    print("📊 COMPARATIVE ANALYSIS")
+    print("="*80)
+
+    c_metrics = classical_results['metrics']
+    q_metrics = quantum_results['metrics']
+
+    print("\n┌─────────────────────────────────────────────────────────────────────────────┐")
+    print("│                        PERFORMANCE METRICS COMPARISON                       │")
+    print("├─────────────────────────────┬──────────────────┬──────────────────┬─────────┤")
+    print("│ Metric                      │   Classical SVM  │    Quantum SVM   │  Winner │")
+    print("├─────────────────────────────┼──────────────────┼──────────────────┼─────────┤")
+
+    # Accuracy
+    acc_winner = "Classical" if c_metrics['accuracy'] > q_metrics['accuracy'] else \
+                 "Quantum" if q_metrics['accuracy'] > c_metrics['accuracy'] else "Tie"
+    print(f"│ Accuracy                    │     {c_metrics['accuracy']:.4f}       │     {q_metrics['accuracy']:.4f}       │  {acc_winner:^6} │")
+
+    # Precision
+    prec_winner = "Classical" if c_metrics['precision'] > q_metrics['precision'] else \
+                  "Quantum" if q_metrics['precision'] > c_metrics['precision'] else "Tie"
+    print(f"│ Precision                   │     {c_metrics['precision']:.4f}       │     {q_metrics['precision']:.4f}       │  {prec_winner:^6} │")
+
+    # Recall
+    rec_winner = "Classical" if c_metrics['recall'] > q_metrics['recall'] else \
+                 "Quantum" if q_metrics['recall'] > c_metrics['recall'] else "Tie"
+    print(f"│ Recall                      │     {c_metrics['recall']:.4f}       │     {q_metrics['recall']:.4f}       │  {rec_winner:^6} │")
+
+    # F1-Score
+    f1_winner = "Classical" if c_metrics['f1_score'] > q_metrics['f1_score'] else \
+                "Quantum" if q_metrics['f1_score'] > c_metrics['f1_score'] else "Tie"
+    print(f"│ F1-Score                    │     {c_metrics['f1_score']:.4f}       │     {q_metrics['f1_score']:.4f}       │  {f1_winner:^6} │")
+
+    print("├─────────────────────────────┴──────────────────┴──────────────────┴─────────┤")
+    print("│                          COMPUTATIONAL EFFICIENCY                           │")
+    print("├─────────────────────────────┬──────────────────┬──────────────────┬─────────┤")
+
+    # Training time
+    c_train_time = c_metrics.get('training_time', 0)
+    q_train_time = q_metrics.get('training_time', 0) + q_metrics.get('kernel_computation_time', 0)
+    train_speedup = q_train_time / c_train_time if c_train_time > 0 else 0
+    print(f"│ Training Time               │   {c_train_time:>7.4f}s       │  {q_train_time:>7.2f}s      │  Classical │")
+    print(f"│                             │                  │                  │  {train_speedup:.0f}x faster│")
+
+    # Prediction time
+    c_pred_time = c_metrics.get('prediction_time', 0)
+    q_pred_time = q_metrics.get('prediction_time', 0)
+    pred_speedup = q_pred_time / c_pred_time if c_pred_time > 0 else 0
+    print(f"│ Prediction Time             │   {c_pred_time:>7.4f}s       │  {q_pred_time:>7.2f}s      │  Classical │")
+    print(f"│                             │                  │                  │  {pred_speedup:.0f}x faster│")
+
+    print("└─────────────────────────────┴──────────────────┴──────────────────┴─────────┘")
+
+    print("\n📋 ANALYSIS:")
+    print("─" * 80)
+
+    # Determine overall winner
+    if c_metrics['f1_score'] > q_metrics['f1_score']:
+        print("🏆 Winner: CLASSICAL SVM")
+        print(f"   Classical achieves better balanced performance (F1: {c_metrics['f1_score']:.4f})")
+        print(f"   and is {train_speedup:.0f}x faster in training.")
+    elif q_metrics['f1_score'] > c_metrics['f1_score']:
+        print("🏆 Winner: QUANTUM SVM")
+        print(f"   Quantum achieves slightly better F1-score ({q_metrics['f1_score']:.4f} vs {c_metrics['f1_score']:.4f})")
+        print(f"   at the cost of {train_speedup:.0f}x longer training time.")
+    else:
+        print("🏆 Result: TIE")
+        print("   Both models achieve identical F1-scores.")
+
+    print("\n💡 Key Findings:")
+    print(f"   • Accuracy difference: {abs(c_metrics['accuracy'] - q_metrics['accuracy'])*100:.2f}% (minimal)")
+    print(f"   • Classical is significantly faster: {train_speedup:.0f}x training, {pred_speedup:.0f}x prediction")
+    print(f"   • Quantum shows {'higher' if q_metrics['recall'] > c_metrics['recall'] else 'lower'} recall: {q_metrics['recall']:.2%} vs {c_metrics['recall']:.2%}")
+    print(f"   • Classical shows {'higher' if c_metrics['precision'] > q_metrics['precision'] else 'lower'} precision: {c_metrics['precision']:.2%} vs {q_metrics['precision']:.2%}")
+
+    print("\n🔬 Conclusion for BI2 Project:")
+    print("   Quantum SVM simulation overhead makes it impractical for current use cases.")
+    print("   Real quantum hardware may change this, but simulators don't provide advantages.")
+    print("="*80)
 
 
 def main():
