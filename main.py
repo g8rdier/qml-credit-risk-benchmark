@@ -31,13 +31,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def run_classical_pipeline(n_components: int = 4, compare_kernel: bool = False) -> dict:
+def run_classical_pipeline(n_components: int = 4, compare_kernel: bool = False, subset_size: int = None) -> dict:
     """
     Run the complete classical SVM pipeline.
 
     Args:
         n_components: Number of PCA components (features for classification)
         compare_kernel: If True, compare different kernel types
+        subset_size: Optional limit on total samples to use (stratified sampling)
 
     Returns:
         Dictionary with results and metrics
@@ -54,8 +55,10 @@ def run_classical_pipeline(n_components: int = 4, compare_kernel: bool = False) 
     # Step 2: Preprocess Data
     print("\n🔧 STEP 2: Preprocessing Data")
     print("-" * 80)
+    if subset_size is not None:
+        print(f"⚡ Using subset mode: Limited to {subset_size} samples (stratified)")
     preprocessor = CreditDataPreprocessor(n_components=n_components)
-    X_train, X_test, y_train, y_test = preprocessor.preprocess_data(X, y)
+    X_train, X_test, y_train, y_test = preprocessor.preprocess_data(X, y, max_samples=subset_size)
 
     # Save preprocessor for reproducibility
     preprocessor.save_preprocessor()
@@ -103,12 +106,13 @@ def run_classical_pipeline(n_components: int = 4, compare_kernel: bool = False) 
     }
 
 
-def run_quantum_pipeline(n_components: int = 4) -> dict:
+def run_quantum_pipeline(n_components: int = 4, subset_size: int = None) -> dict:
     """
     Run the quantum SVM pipeline.
 
     Args:
         n_components: Number of PCA components (= number of qubits)
+        subset_size: Optional limit on total samples to use (stratified sampling)
 
     Returns:
         Dictionary with results and metrics
@@ -128,8 +132,10 @@ def run_quantum_pipeline(n_components: int = 4) -> dict:
     # Step 2: Preprocess Data
     print("\n🔧 STEP 2: Preprocessing Data")
     print("-" * 80)
+    if subset_size is not None:
+        print(f"⚡ Using subset mode: Limited to {subset_size} samples (stratified)")
     preprocessor = CreditDataPreprocessor(n_components=n_components)
-    X_train, X_test, y_train, y_test = preprocessor.preprocess_data(X, y)
+    X_train, X_test, y_train, y_test = preprocessor.preprocess_data(X, y, max_samples=subset_size)
 
     # Save preprocessor for reproducibility
     preprocessor.save_preprocessor()
@@ -171,7 +177,7 @@ def run_quantum_pipeline(n_components: int = 4) -> dict:
     }
 
 
-def create_comparison_visualization(classical_metrics: dict, quantum_metrics: dict, save_path: str = "results/comparison_summary.png") -> None:
+def create_comparison_visualization(classical_metrics: dict, quantum_metrics: dict, save_path: str = "results/comparison_summary.png", n_train: int = 800, n_test: int = 200) -> None:
     """
     Create a comprehensive comparison visualization.
 
@@ -179,6 +185,8 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
         classical_metrics: Metrics from classical SVM
         quantum_metrics: Metrics from quantum SVM
         save_path: Path to save the visualization
+        n_train: Number of training samples used
+        n_test: Number of test samples used
     """
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
     fig.suptitle('Classical vs Quantum SVM: Comprehensive Comparison\nBI2 Project - German Credit Risk Dataset',
@@ -269,13 +277,14 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     # 4. Summary Text Box
     ax4.axis('off')
 
+    total_samples = n_train + n_test
     summary_text = f"""
     EXPERIMENT SUMMARY
     {'='*50}
 
     Dataset: German Credit Risk (OpenML)
-    Samples: 1,000 (800 train / 200 test)
-    Features: 48 → 4 (PCA, {quantum_metrics.get('n_qubits', 4)} qubits)
+    Samples: {total_samples} ({n_train} train / {n_test} test)
+    Features: 48 → {quantum_metrics.get('n_qubits', 4)} (PCA, {quantum_metrics.get('n_qubits', 4)} qubits)
 
     PERFORMANCE WINNER: {'Quantum' if quantum_metrics['f1_score'] > classical_metrics['f1_score'] else 'Classical' if classical_metrics['f1_score'] > quantum_metrics['f1_score'] else 'Tie'}
     • Accuracy Δ: {abs(classical_metrics['accuracy'] - quantum_metrics['accuracy'])*100:.2f}% (minimal)
@@ -312,22 +321,23 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     plt.close()
 
 
-def run_comparison(n_components: int = 4) -> None:
+def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     """
     Run both classical and quantum pipelines and compare results.
 
     Args:
         n_components: Number of PCA components
+        subset_size: Optional limit on total samples to use (stratified sampling)
     """
     print("\n" + "="*80)
     print("CLASSICAL VS QUANTUM SVM COMPARISON")
     print("="*80)
 
     # Run classical
-    classical_results = run_classical_pipeline(n_components=n_components)
+    classical_results = run_classical_pipeline(n_components=n_components, subset_size=subset_size)
 
     # Run quantum
-    quantum_results = run_quantum_pipeline(n_components=n_components)
+    quantum_results = run_quantum_pipeline(n_components=n_components, subset_size=subset_size)
 
     # Compare results
     print("\n" + "="*80)
@@ -411,7 +421,9 @@ def run_comparison(n_components: int = 4) -> None:
     print("="*80)
 
     # Generate comparison visualization
-    create_comparison_visualization(c_metrics, q_metrics)
+    n_train = len(quantum_results['X_train'])
+    n_test = len(quantum_results['X_test'])
+    create_comparison_visualization(c_metrics, q_metrics, n_train=n_train, n_test=n_test)
 
 
 def main():
@@ -427,11 +439,14 @@ Examples:
   # Compare different classical kernels
   python main.py --mode classical --compare-kernels
 
-  # Run with 8 components (8 qubits for quantum)
-  python main.py --mode classical --n-components 8
+  # Run quantum with 8 qubits and limited dataset (fast test)
+  python main.py --mode quantum --n-components 8 --subset-size 200
 
-  # Full comparison (when quantum is implemented)
-  python main.py --mode compare
+  # Full comparison with reduced data (for high qubit counts)
+  python main.py --mode compare --n-components 8 --subset-size 250
+
+  # Full dataset comparison (slow with high qubit counts!)
+  python main.py --mode compare --n-components 4
         """
     )
 
@@ -456,6 +471,13 @@ Examples:
         help='Compare different classical kernel types'
     )
 
+    parser.add_argument(
+        '--subset-size',
+        type=int,
+        default=None,
+        help='Limit dataset to N samples (stratified). Useful for quick tests with high qubit counts. Example: --subset-size 200'
+    )
+
     args = parser.parse_args()
 
     # Validate n_components
@@ -463,19 +485,35 @@ Examples:
         print("⚠️  Warning: n_components should typically be between 2 and 20")
         print(f"   You specified: {args.n_components}")
 
+    # Validate subset_size
+    if args.subset_size is not None:
+        if args.subset_size < 50:
+            print("⚠️  Warning: subset_size < 50 may not provide statistically meaningful results")
+            print(f"   You specified: {args.subset_size}")
+        if args.subset_size > 1000:
+            print("⚠️  Warning: The full dataset has ~1000 samples, your subset_size is larger")
+            print(f"   You specified: {args.subset_size}")
+
     # Execute based on mode
     try:
         if args.mode == 'classical':
             run_classical_pipeline(
                 n_components=args.n_components,
-                compare_kernel=args.compare_kernels
+                compare_kernel=args.compare_kernels,
+                subset_size=args.subset_size
             )
 
         elif args.mode == 'quantum':
-            run_quantum_pipeline(n_components=args.n_components)
+            run_quantum_pipeline(
+                n_components=args.n_components,
+                subset_size=args.subset_size
+            )
 
         elif args.mode == 'compare':
-            run_comparison(n_components=args.n_components)
+            run_comparison(
+                n_components=args.n_components,
+                subset_size=args.subset_size
+            )
 
     except KeyboardInterrupt:
         print("\n\n⚠️  Execution interrupted by user")

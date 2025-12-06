@@ -220,13 +220,16 @@ class CreditDataPreprocessor:
 
         return feature_names
 
-    def preprocess_data(self, X: pd.DataFrame, y: pd.Series) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def preprocess_data(self, X: pd.DataFrame, y: pd.Series, max_samples: Optional[int] = None) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Complete preprocessing pipeline.
 
         Args:
             X: Features DataFrame
             y: Target Series
+            max_samples: Optional maximum number of samples to use (stratified subsampling).
+                        If specified, a random subset of size max_samples is selected
+                        before train/test split. Useful for testing with high qubit counts.
 
         Returns:
             Tuple of (X_train, X_test, y_train, y_test) - all after full preprocessing
@@ -240,6 +243,18 @@ class CreditDataPreprocessor:
 
         # 2. Handle missing values
         X_clean = self.handle_missing_values(X)
+
+        # 2.5. Apply stratified subsampling if requested
+        if max_samples is not None and max_samples < len(X_clean):
+            print(f"\n🎲 Applying stratified subsampling: {len(X_clean)} → {max_samples} samples...")
+            X_clean, _, y, _ = train_test_split(
+                X_clean, y,
+                train_size=max_samples,
+                random_state=self.random_state,
+                stratify=y
+            )
+            print(f"   - Reduced to {len(X_clean)} samples (class distribution preserved)")
+            print(f"   - Target distribution: {y.value_counts().to_dict()}")
 
         # 3. Split data BEFORE encoding (to prevent data leakage)
         print(f"\n✂️  Splitting data ({(1-self.test_size)*100:.0f}% train / {self.test_size*100:.0f}% test)...")
