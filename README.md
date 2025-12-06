@@ -193,10 +193,10 @@ The project tracks the following metrics for comparison:
 
 ### Key Findings
 
-✅ **Performance**: Quantum achieves marginally better F1-score (2.4% improvement)
-✅ **Hypothesis Validated**: Similar accuracy to classical (~0.5% difference)
-❌ **Computational Cost**: Quantum is 14,801x slower due to simulation overhead
-⚠️ **Practical Conclusion**: Quantum simulation provides no practical advantage for production use
+- **Performance**: Quantum achieves marginally better F1-score (2.4% improvement)
+- **Hypothesis Validated**: Similar accuracy to classical (~0.5% difference)
+- **Computational Cost**: Quantum is 14,801x slower due to simulation overhead
+- **Practical Conclusion**: Quantum simulation provides no practical advantage for production use
 
 **Trade-offs:**
 - **Quantum**: Exceptional recall (98.57%) - catches almost all good credits but with more false positives
@@ -211,14 +211,6 @@ The comprehensive comparison includes:
 - Computational efficiency comparison (log scale)
 - Performance heatmap
 - Summary analysis for BI2 project
-
-## Project Timeline
-
-- [x] **Phase 1**: Data loading and preprocessing
-- [x] **Phase 2**: Classical SVM benchmark
-- [x] **Phase 3**: Quantum SVM implementation
-- [x] **Phase 4**: Comparative analysis and visualization
-- [ ] **Phase 5**: Final report and presentation
 
 ## Technical Notes
 
@@ -283,23 +275,6 @@ python src/classical_svm.py
 - Docstrings in Google style
 - English comments
 - PEP 8 compliant
-
-## Future Work
-
-1. **Hyperparameter Optimization**
-   - Grid search for C and gamma
-   - Cross-validation
-   - Automated kernel selection
-
-2. **Extended Comparison**
-   - Multiple datasets
-   - Real quantum hardware (IBM Quantum, IonQ)
-   - Comparison with other QML algorithms
-
-3. **Deployment**
-   - REST API for model serving
-   - Streamlit dashboard for visualization
-   - Docker containerization
 
 ## References
 
