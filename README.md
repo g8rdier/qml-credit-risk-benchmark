@@ -143,7 +143,7 @@ Or open directly in VS Code with the Jupyter extension.
 
 **What the notebook provides:**
 - Interactive data visualization and PCA analysis
-- Kernel comparison experiments (RBF, linear, poly, sigmoid)
+- Kernel comparison experiments (RBF, linear, poly)
 - Hyperparameter tuning (C values, component counts)
 - Step-by-step walkthrough of the preprocessing pipeline
 - Real-time plotting of confusion matrices, ROC curves, and performance metrics
@@ -376,7 +376,7 @@ python src/classical_svm.py
 
 ## Author
 
-Gregor Kobilarov
+[Gregor Kobilarov](https://github.com/g8rdier)
 
 ## License
 
