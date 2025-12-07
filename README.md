@@ -552,7 +552,9 @@ pixi run python src/classical_svm.py
 
 ## License
 
-This project is for educational purposes as part of a university course.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+This project was created for educational purposes as part of a university course.
 
 ---
 
