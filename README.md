@@ -1,5 +1,40 @@
 # Quantum vs Classical SVM Credit Risk Classification: Empirical Benchmark Study
 
+## Table of Contents
+- [Academic Context](#academic-context)
+- [Research Question](#research-question)
+- [Hypothesis](#hypothesis)
+- [Dataset Characteristics](#dataset-characteristics)
+- [Project Architecture](#project-architecture)
+- [Key Features](#key-features)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Quick Start](#quick-start)
+  - [Scalability Testing](#scalability-testing-subset-mode)
+  - [Interactive Exploration (Jupyter Notebook)](#interactive-exploration-jupyter-notebook)
+  - [Advanced Usage](#advanced-usage)
+- [Glossary for Beginners](#glossary-for-beginners)
+  - [Machine Learning Concepts](#machine-learning-concepts)
+  - [Performance Metrics Explained](#performance-metrics-explained)
+  - [Quantum Computing Concepts](#quantum-computing-concepts)
+- [Evaluation Metrics](#evaluation-metrics)
+- [Experimental Results](#experimental-results)
+  - [Performance Comparison](#performance-comparison)
+  - [Computational Efficiency](#computational-efficiency)
+  - [Key Findings](#key-findings)
+  - [Scalability Analysis](#scalability-analysis)
+  - [Visualizations](#visualizations)
+- [Technical Notes](#technical-notes)
+  - [PCA Component Selection](#pca-component-selection)
+  - [Kernel Comparison](#kernel-comparison)
+- [Troubleshooting](#troubleshooting)
+- [Development](#development)
+- [References](#references)
+- [Author](#author)
+- [License](#license)
+
+---
+
 ## Academic Context
 
 - **Course:** Business Intelligence 2, 6th Semester
