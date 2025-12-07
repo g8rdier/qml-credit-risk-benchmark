@@ -79,7 +79,7 @@ def create_error_analysis_plot():
                 color='#f39c12', alpha=0.8)
 
     ax2.set_ylabel('Cost (€ thousands)', fontweight='bold')
-    ax2.set_title('Estimated Business Impact', fontweight='bold', pad=15)
+    ax2.set_title('Hypothetical Business Impact*', fontweight='bold', pad=15)
     ax2.set_xticks(x_pos)
     ax2.set_xticklabels(models)
     ax2.legend()
@@ -160,10 +160,12 @@ def create_error_analysis_plot():
        • Quantum: 57 good credits rejected (54% increase)
        → More conservative lending approach
 
-    3. BUSINESS IMPACT (per 200 loan applications)
+    3. BUSINESS IMPACT* (per 200 loan applications)
        • Classical total cost: €170,500 (€152k defaults + €18.5k lost opportunities)
        • Quantum total cost: €44,500 (€16k defaults + €28.5k lost opportunities)
        → €126,000 savings (73.9% cost reduction)
+       *Hypothetical scenario using industry-typical assumptions (€10k avg loan,
+        80% default loss rate, 5% opportunity cost)
 
     4. STRATEGIC IMPLICATIONS
        • Quantum SVM: Risk-averse strategy, suitable for conservative lending

@@ -124,13 +124,15 @@ def analyze_confusion_matrices():
 
     # Business Impact Analysis
     print("\n" + "-"*80)
-    print("BUSINESS IMPACT ANALYSIS (Financial Perspective)")
+    print("HYPOTHETICAL BUSINESS IMPACT ANALYSIS")
     print("-"*80)
+    print("\n⚠️  NOTE: This analysis uses illustrative assumptions based on")
+    print("   industry-typical parameters, NOT actual financial data from the dataset.")
 
-    # Typical credit risk costs (example values)
-    avg_loan_amount = 10000  # €10,000 average loan
-    default_loss_rate = 0.80  # 80% loss on default
-    opportunity_cost = 0.05  # 5% profit margin on good loans
+    # Illustrative credit risk costs (industry-typical assumptions)
+    avg_loan_amount = 10000  # €10,000 average loan (typical consumer credit)
+    default_loss_rate = 0.80  # 80% loss on default (typical for unsecured credit)
+    opportunity_cost = 0.05  # 5% profit margin on good loans (conservative estimate)
 
     classical_cost = (classical_cm['FN'] * avg_loan_amount * default_loss_rate +
                      classical_cm['FP'] * avg_loan_amount * opportunity_cost)

@@ -252,11 +252,13 @@ The comprehensive comparison includes:
 
 **Error Pattern Analysis** reveals critical business insights:
 - **89.5% reduction in false negatives** (19 → 2 bad credits approved)
-- **Business impact**: €126k cost savings per 200 applications (73.9% reduction)
+- **Hypothetical business impact**: Using industry-typical assumptions (€10k avg loan, 80% default loss rate, 5% opportunity cost), this error reduction translates to ~€126k cost savings per 200 applications
 - **Trade-off**: 54% increase in false positives (more conservative lending)
 - **Risk profile comparison**: Quantum optimizes for recall (catching defaults), Classical balances precision/recall
 
 This visualization demonstrates that quantum SVM isn't just marginally better - it has a fundamentally different error profile suitable for risk-averse institutions.
+
+*Note: Business impact figures are illustrative examples using representative industry parameters, not actual financial data from the dataset.*
 
 ## Technical Notes
 
