@@ -6,8 +6,8 @@
 - **Institution:** IU International University of Applied Sciences
 - **Supervisor:** Dr. Stefan Nisch
 - **Student:** Gregor Kobilarov
-- **Dataset:** German Credit Risk Dataset (Kaggle, n=1,000)
-- **Primary Contribution:** Production-ready QML benchmark with modern tooling (pixi, kagglehub) comparing quantum and classical SVM performance on structured financial data
+- **Dataset:** German Credit Risk Dataset (OpenML, n=1,000)
+- **Primary Contribution:** Production-ready QML benchmark with modern tooling (pixi) comparing quantum and classical SVM performance on structured financial data
 
 ## Research Question
 
@@ -20,9 +20,9 @@ QSVM achieves similar accuracy in high-dimensional spaces but requires significa
 ## Dataset Characteristics
 
 **German Credit Risk Dataset**
-- **Source:** Kaggle (kabure/german-credit-data-with-risk)
+- **Source:** OpenML (credit-g, dataset version 1)
 - **Samples:** 1,000 credit applications
-- **Features:** 10 attributes (5 numeric, 5 categorical)
+- **Features:** 20 attributes (7 numeric, 13 categorical)
 - **Target:** Binary classification (Good Credit: 700, Bad Credit: 300)
 - **Task:** Predict creditworthiness based on applicant attributes
 
@@ -35,7 +35,7 @@ qml-credit-risk-benchmark/
 │   ├── data_loader.py          # Data loading from OpenML/CSV
 │   ├── preprocessing.py        # Cleaning, encoding, scaling, PCA
 │   ├── classical_svm.py        # Classical SVM implementation
-│   └── quantum_svm.py          # QSVM implementation (TODO)
+│   └── quantum_svm.py          # QSVM implementation
 ├── data/
 │   ├── raw/                    # Raw data files
 │   └── processed/              # Preprocessed data
@@ -43,7 +43,8 @@ qml-credit-risk-benchmark/
 ├── results/                    # Plots and result files
 ├── notebooks/                  # Jupyter notebooks for exploration
 ├── main.py                     # Main execution script
-├── requirements.txt
+├── pixi.toml                   # Pixi dependency configuration
+├── pixi.lock                   # Locked dependency versions
 └── README.md
 ```
 
@@ -53,7 +54,7 @@ qml-credit-risk-benchmark/
 - **Data Loader**: Fetches data from OpenML or loads from CSV
 - **Preprocessor**: Handles missing values, encoding, scaling, and PCA
 - **Classical SVM**: Scikit-learn based with multiple kernel options
-- **Quantum SVM**: (In Progress) Qiskit-based quantum kernel
+- **Quantum SVM**: Qiskit-based quantum kernel with caching support
 
 ### Critical Pre-processing Pipeline
 
@@ -80,22 +81,41 @@ qml-credit-risk-benchmark/
 ## Installation
 
 ### Prerequisites
-- Python 3.9+
-- pip or conda
+- [pixi](https://pixi.sh) package manager (recommended)
+- OR Python 3.11+ with pip (alternative)
 
-### Setup
+### Setup with Pixi (Recommended)
+
+```bash
+# Install pixi if not already installed
+curl -fsSL https://pixi.sh/install.sh | bash
+
+# Clone the repository
+git clone <repository-url>
+cd qml-credit-risk-benchmark
+
+# Install all dependencies automatically
+pixi install
+
+# Run commands using pixi
+pixi run python main.py --mode classical
+```
+
+**Why pixi?** Pixi provides reproducible dependency management, cross-platform compatibility, and automatic environment handling without manual virtual environment setup.
+
+### Alternative Setup (pip)
 
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd qml-credit-risk-benchmark
 
-# Create virtual environment (recommended)
+# Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies manually
+pip install scikit-learn qiskit qiskit-machine-learning pandas numpy matplotlib seaborn
 ```
 
 ## Usage
@@ -104,16 +124,16 @@ pip install -r requirements.txt
 
 ```bash
 # Run classical SVM with default settings (4 PCA components)
-python main.py --mode classical
+pixi run python main.py --mode classical
 
 # Run quantum SVM with 4 qubits (full dataset)
-python main.py --mode quantum --n-components 4
+pixi run python main.py --mode quantum --n-components 4
 
 # Compare classical vs quantum (full analysis)
-python main.py --mode compare --n-components 4
+pixi run python main.py --mode compare --n-components 4
 
 # Compare different classical kernel types
-python main.py --mode classical --compare-kernels
+pixi run python main.py --mode classical --compare-kernels
 ```
 
 ### Scalability Testing (Subset Mode)
@@ -122,10 +142,10 @@ For testing with higher qubit counts where full dataset simulation is infeasible
 
 ```bash
 # Test 8-qubit quantum circuit with reduced dataset
-python main.py --mode quantum --n-components 8 --subset-size 200
+pixi run python main.py --mode quantum --n-components 8 --subset-size 200
 
 # Compare classical vs quantum with subset (stratified sampling)
-python main.py --mode compare --n-components 8 --subset-size 250
+pixi run python main.py --mode compare --n-components 8 --subset-size 250
 ```
 
 The `--subset-size` parameter enables stratified subsampling while preserving class distribution. This is useful for proof-of-concept experiments with higher dimensional quantum circuits that would otherwise cause computational infeasibility on consumer hardware.
@@ -135,11 +155,12 @@ The `--subset-size` parameter enables stratified subsampling while preserving cl
 For interactive data exploration and classical SVM experimentation:
 
 ```bash
-# Launch Jupyter notebook
-jupyter notebook notebooks/01_classical_svm_exploration.ipynb
-```
+# Launch Jupyter notebook with pixi
+pixi run jupyter notebook notebooks/01_classical_svm_exploration.ipynb
 
-Or open directly in VS Code with the Jupyter extension.
+# Alternative: open directly in VS Code with the Jupyter extension
+code notebooks/01_classical_svm_exploration.ipynb
+```
 
 **What the notebook provides:**
 - Interactive data visualization and PCA analysis
@@ -207,7 +228,7 @@ The project tracks the following metrics for comparison:
 |--------|-------------|------------|
 | **Accuracy** | Overall correctness | Primary metric |
 | **Precision** | Positive predictive value | Important for credit risk |
-| **Recall** | True positive rate | Critical for catching bad credits |
+| **Recall** | True positive rate | Critical for identifying good credits |
 | **F1-Score** | Harmonic mean of precision/recall | Balanced performance |
 | **ROC AUC** | Area under ROC curve | Model discrimination ability |
 | **Training Time** | Time to fit model | Computational cost |
@@ -231,6 +252,8 @@ The project tracks the following metrics for comparison:
 | **Training** | 0.05s | 774.72s | Classical 15,494x faster |
 | **Prediction** | 0.003s | 409.40s | Classical 136,467x faster |
 | **Total Time** | 0.08s | 1,184.13s | Classical 14,801x faster |
+
+**Methodology Note:** Quantum timing results reflect first-run performance without kernel caching. The quantum implementation includes a caching mechanism for kernel matrices (stored in `data/processed/`), which can speed up repeated experiments with identical parameters. However, all reported benchmarks use fresh kernel computation to ensure fair comparison with classical methods and represent realistic first-run performance.
 
 ### Key Findings
 
@@ -278,7 +301,7 @@ The comprehensive comparison includes:
 - **89.5% reduction in false negatives** (19 → 2 bad credits approved)
 - **Hypothetical business impact**: Using industry-typical assumptions (€10k avg loan, 80% default loss rate, 5% opportunity cost), this error reduction translates to ~€126k cost savings per 200 applications
 - **Trade-off**: 54% increase in false positives (more conservative lending)
-- **Risk profile comparison**: Quantum optimizes for recall (catching defaults), Classical balances precision/recall
+- **Risk profile comparison**: Quantum optimizes for recall (minimizing missed good credits), Classical balances precision/recall
 
 This visualization demonstrates that quantum SVM isn't just marginally better - it has a fundamentally different error profile suitable for risk-averse institutions.
 
@@ -320,8 +343,8 @@ This visualization demonstrates that quantum SVM isn't just marginally better - 
 
 ### Common Issues
 
-**Issue**: `ModuleNotFoundError: No module named 'sklearn'`
-**Solution**: Install requirements: `pip install -r requirements.txt`
+**Issue**: `ModuleNotFoundError: No module named 'sklearn'` or similar dependency errors
+**Solution**: Ensure you're using pixi: `pixi install` or manually install dependencies with pip
 
 **Issue**: Memory error during PCA
 **Solution**: Reduce `n_components` or use incremental PCA
@@ -330,7 +353,7 @@ This visualization demonstrates that quantum SVM isn't just marginally better - 
 **Solution**: Try different kernels with `--compare-kernels` flag
 
 **Issue**: Quantum implementation not working
-**Solution**: Ensure Qiskit is installed: `pip install qiskit qiskit-machine-learning`
+**Solution**: Verify Qiskit installation: `pixi list | grep qiskit` or reinstall with `pixi install`
 
 **Issue**: System freezes or becomes unresponsive with high qubit counts
 **Solution**: Use `--subset-size` parameter to reduce dataset size. Example: `--subset-size 200` for 8+ qubits. Note that classical quantum simulation has fundamental exponential scaling limits.
@@ -357,9 +380,9 @@ Output files:
 ### Running Tests
 ```bash
 # Test individual modules
-python src/data_loader.py
-python src/preprocessing.py
-python src/classical_svm.py
+pixi run python src/data_loader.py
+pixi run python src/preprocessing.py
+pixi run python src/classical_svm.py
 ```
 
 ### Code Style
@@ -371,7 +394,7 @@ python src/classical_svm.py
 ## References
 
 - German Credit Data: [OpenML](https://www.openml.org/d/31)
-- Qiskit Machine Learning: [Documentation](https://qiskit.org/documentation/machine-learning/)
+- Qiskit Machine Learning: [Documentation](https://qiskit-community.github.io/qiskit-machine-learning/)
 - Scikit-learn SVM: [User Guide](https://scikit-learn.org/stable/modules/svm.html)
 
 ## Author
