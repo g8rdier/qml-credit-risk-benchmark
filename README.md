@@ -234,7 +234,9 @@ Attempts to scale to 8 qubits revealed fundamental computational limits of class
 
 This empirical barrier confirms the exponential scaling problem of classical quantum simulation and demonstrates why **real quantum hardware** is necessary for practical QML applications beyond proof-of-concept demonstrations. The `--subset-size` parameter was implemented to enable controlled experiments, but fundamental physics limits classical simulation regardless of engineering optimizations.
 
-### Visualization
+### Visualizations
+
+#### Comprehensive Comparison Summary
 
 ![Comparison Summary](results/comparison_summary.png)
 
@@ -243,6 +245,18 @@ The comprehensive comparison includes:
 - Computational efficiency comparison (log scale)
 - Performance heatmap
 - Summary analysis for BI2 project
+
+#### Deep Error Analysis
+
+![Error Analysis](results/error_analysis_comprehensive.png)
+
+**Error Pattern Analysis** reveals critical business insights:
+- **89.5% reduction in false negatives** (19 → 2 bad credits approved)
+- **Business impact**: €126k cost savings per 200 applications (73.9% reduction)
+- **Trade-off**: 54% increase in false positives (more conservative lending)
+- **Risk profile comparison**: Quantum optimizes for recall (catching defaults), Classical balances precision/recall
+
+This visualization demonstrates that quantum SVM isn't just marginally better - it has a fundamentally different error profile suitable for risk-averse institutions.
 
 ## Technical Notes
 
@@ -296,6 +310,23 @@ The comprehensive comparison includes:
 **Solution**: Use `--subset-size` parameter to reduce dataset size. Example: `--subset-size 200` for 8+ qubits. Note that classical quantum simulation has fundamental exponential scaling limits.
 
 ## Development
+
+### Running Analysis Scripts
+
+Generate thesis-ready analysis and visualizations:
+
+```bash
+# Run comprehensive analysis (confusion matrix, PCA, business impact)
+pixi run python analysis.py
+
+# Generate error analysis visualization
+pixi run python create_error_analysis_plot.py
+```
+
+Output files:
+- `results/thesis_summary_table.csv` - Ready for thesis tables
+- `results/confusion_matrix_comparison.csv` - Detailed error breakdown
+- `results/error_analysis_comprehensive.png` - Publication-quality visualization
 
 ### Running Tests
 ```bash
