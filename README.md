@@ -130,6 +130,30 @@ python main.py --mode compare --n-components 8 --subset-size 250
 
 The `--subset-size` parameter enables stratified subsampling while preserving class distribution. This is useful for proof-of-concept experiments with higher dimensional quantum circuits that would otherwise cause computational infeasibility on consumer hardware.
 
+### Interactive Exploration (Jupyter Notebook)
+
+For interactive data exploration and classical SVM experimentation:
+
+```bash
+# Launch Jupyter notebook
+jupyter notebook notebooks/01_classical_svm_exploration.ipynb
+```
+
+Or open directly in VS Code with the Jupyter extension.
+
+**What the notebook provides:**
+- Interactive data visualization and PCA analysis
+- Kernel comparison experiments (RBF, linear, poly, sigmoid)
+- Hyperparameter tuning (C values, component counts)
+- Step-by-step walkthrough of the preprocessing pipeline
+- Real-time plotting of confusion matrices, ROC curves, and performance metrics
+
+**When to use it:**
+- Exploring the dataset characteristics before running experiments
+- Testing different preprocessing configurations interactively
+- Understanding how PCA component selection affects model performance
+- Experimenting with classical SVM kernels without waiting for full pipeline runs
+
 ### Advanced Usage
 
 #### Using Individual Modules
