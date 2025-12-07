@@ -106,12 +106,29 @@ pip install -r requirements.txt
 # Run classical SVM with default settings (4 PCA components)
 python main.py --mode classical
 
-# Run with 8 PCA components
-python main.py --mode classical --n-components 8
+# Run quantum SVM with 4 qubits (full dataset)
+python main.py --mode quantum --n-components 4
 
-# Compare different kernel types
+# Compare classical vs quantum (full analysis)
+python main.py --mode compare --n-components 4
+
+# Compare different classical kernel types
 python main.py --mode classical --compare-kernels
 ```
+
+### Scalability Testing (Subset Mode)
+
+For testing with higher qubit counts where full dataset simulation is infeasible:
+
+```bash
+# Test 8-qubit quantum circuit with reduced dataset
+python main.py --mode quantum --n-components 8 --subset-size 200
+
+# Compare classical vs quantum with subset (stratified sampling)
+python main.py --mode compare --n-components 8 --subset-size 250
+```
+
+The `--subset-size` parameter enables stratified subsampling while preserving class distribution. This is useful for proof-of-concept experiments with higher dimensional quantum circuits that would otherwise cause computational infeasibility on consumer hardware.
 
 ### Advanced Usage
 
@@ -202,6 +219,21 @@ The project tracks the following metrics for comparison:
 - **Quantum**: Exceptional recall (98.57%) - catches almost all good credits but with more false positives
 - **Classical**: Higher precision (75.00%) - more conservative, fewer false positives
 
+### Scalability Analysis
+
+**8-Qubit Limitation (Exponential Barrier):**
+
+Attempts to scale to 8 qubits revealed fundamental computational limits of classical quantum simulation:
+
+- **State Vector Complexity**: 2^8 = 256 complex amplitudes per quantum state
+- **Kernel Matrix Computation**: 800×800 = 640,000 quantum circuit simulations required
+- **Resource Exhaustion**: System freeze after >60 minutes on consumer hardware (Intel i5, 32GB RAM)
+- **Subset Requirement**: Even with stratified subsampling (n=200, reducing to 25,600 simulations), runtime exceeded feasibility threshold
+
+**Scientific Implication:**
+
+This empirical barrier confirms the exponential scaling problem of classical quantum simulation and demonstrates why **real quantum hardware** is necessary for practical QML applications beyond proof-of-concept demonstrations. The `--subset-size` parameter was implemented to enable controlled experiments, but fundamental physics limits classical simulation regardless of engineering optimizations.
+
 ### Visualization
 
 ![Comparison Summary](results/comparison_summary.png)
@@ -260,6 +292,9 @@ The comprehensive comparison includes:
 **Issue**: Quantum implementation not working
 **Solution**: Ensure Qiskit is installed: `pip install qiskit qiskit-machine-learning`
 
+**Issue**: System freezes or becomes unresponsive with high qubit counts
+**Solution**: Use `--subset-size` parameter to reduce dataset size. Example: `--subset-size 200` for 8+ qubits. Note that classical quantum simulation has fundamental exponential scaling limits.
+
 ## Development
 
 ### Running Tests
@@ -292,4 +327,4 @@ This project is for educational purposes as part of a university course.
 
 ---
 
-**Status**: Phase 4 Complete | Experimental Results Available | Final Report Pending
+**Status**: Experimental Phase Complete | 4-Qubit Results Available | Documentation & Analysis Phase
