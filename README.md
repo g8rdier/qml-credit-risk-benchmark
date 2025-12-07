@@ -220,6 +220,120 @@ svm.plot_roc_curve(X_test, y_test)
 svm.save_model("models/classical_svm.pkl")
 ```
 
+## Glossary for Beginners
+
+If you're new to machine learning or quantum computing, here are the key terms explained:
+
+### Machine Learning Concepts
+
+**Classification**
+- Task of predicting which category something belongs to (e.g., "good credit" vs "bad credit")
+- The model learns patterns from labeled examples (training data) and applies them to new cases
+
+**Support Vector Machine (SVM)**
+- A classification algorithm that finds the best boundary (hyperplane) to separate different categories
+- Works by maximizing the margin (distance) between the boundary and the nearest data points from each class
+- Can handle non-linear patterns using "kernel tricks"
+
+**Kernel**
+- A mathematical function that transforms data into a higher-dimensional space
+- Allows SVMs to find complex, non-linear decision boundaries
+- Common kernels: Linear (straight line), RBF (curved boundary), Polynomial (curved with specific shape)
+
+**Training vs Testing**
+- **Training data:** Examples the model learns from (80% of dataset in this project)
+- **Testing data:** Examples used to evaluate the model's performance on unseen data (20% of dataset)
+- This split ensures the model can generalize, not just memorize
+
+**Feature**
+- An individual measurable property used for prediction (e.g., age, income, loan amount)
+- Original dataset has 20 features; we reduce to 4 using PCA for quantum compatibility
+
+**Principal Component Analysis (PCA)**
+- A technique to reduce the number of features while keeping the most important information
+- Combines correlated features into fewer "principal components"
+- Example: Instead of tracking "height" and "weight" separately, create a single "size" component
+
+### Performance Metrics Explained
+
+**Confusion Matrix Terms:**
+- **True Positive (TP):** Correctly predicted "good credit"
+- **True Negative (TN):** Correctly predicted "bad credit"
+- **False Positive (FP):** Predicted "good" but actually "bad" (approved a risky loan)
+- **False Negative (FN):** Predicted "bad" but actually "good" (rejected a safe loan)
+
+**Accuracy**
+- Formula: (TP + TN) / Total predictions
+- What it means: Percentage of all predictions that were correct
+- Limitation: Can be misleading with imbalanced datasets (e.g., if 90% are "good credit", predicting "good" for everything gives 90% accuracy)
+
+**Precision**
+- Formula: TP / (TP + FP)
+- What it means: Of all loans we approved, what percentage were actually good?
+- High precision = Few false positives = Conservative lending (reject doubtful cases)
+
+**Recall**
+- Formula: TP / (TP + FN)
+- What it means: Of all actual good credits, what percentage did we correctly identify?
+- High recall = Few false negatives = Aggressive lending (approve most cases)
+
+**F1-Score**
+- Formula: 2 × (Precision × Recall) / (Precision + Recall)
+- What it means: Balanced metric that considers both precision and recall
+- Useful when you care equally about false positives and false negatives
+- Range: 0 (worst) to 1 (perfect)
+
+**ROC AUC (Area Under Curve)**
+- Measures the model's ability to distinguish between classes across all threshold settings
+- Range: 0.5 (random guessing) to 1.0 (perfect classification)
+- Higher is better
+
+### Quantum Computing Concepts
+
+**Qubit**
+- The quantum equivalent of a classical bit
+- Unlike classical bits (0 or 1), qubits can be in superposition (both 0 and 1 simultaneously)
+- This allows quantum computers to explore multiple possibilities at once
+
+**Quantum Circuit**
+- A sequence of quantum operations (gates) applied to qubits
+- Analogous to a classical computer program but for quantum hardware
+- In this project, circuits encode credit risk data into quantum states
+
+**Quantum Feature Map**
+- Encodes classical data (credit features) into quantum states
+- Creates a high-dimensional quantum representation of the data
+- Allows quantum algorithms to find patterns classical algorithms might miss
+
+**Quantum Kernel**
+- Measures similarity between data points in quantum feature space
+- Computed by running quantum circuits and measuring overlap between quantum states
+- Replaces classical kernel computation in quantum SVM
+
+**Quantum Simulation**
+- Running quantum algorithms on classical computers by explicitly tracking all quantum states
+- Exponentially expensive: 4 qubits = 16 states, 8 qubits = 256 states, 20 qubits = 1 million states
+- Why real quantum hardware is needed for practical applications
+
+**Hilbert Space**
+- The mathematical space where quantum states exist
+- Exponentially large compared to classical state space
+- Quantum advantage comes from exploring this massive space efficiently
+
+### This Project's Approach
+
+**Classical SVM:** Uses traditional RBF kernel on 4 PCA-reduced features
+- Fast (0.05 seconds training)
+- Well-understood and proven
+- Good baseline performance
+
+**Quantum SVM:** Uses quantum kernel with 4-qubit quantum circuits
+- Slow in simulation (774 seconds training)
+- Explores quantum feature space
+- Marginal performance improvement in this experiment
+
+**The Comparison:** Tests whether quantum provides practical advantages for credit risk classification on current (simulated) quantum hardware.
+
 ## Evaluation Metrics
 
 The project tracks the following metrics for comparison:
