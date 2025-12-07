@@ -1,0 +1,10 @@
+Metric,Classical SVM,Quantum SVM,Interpretation
+True Negatives (TN),23,3,Bad credits correctly rejected
+False Positives (FP),37,57,Good credits wrongly rejected (lost business)
+False Negatives (FN),19,2,Bad credits wrongly approved (DEFAULT RISK)
+True Positives (TP),121,138,Good credits correctly approved
+,,,
+Type I Error Rate,61.7%,95.0%,False Positive Rate (good→bad)
+Type II Error Rate,13.6%,1.4%,False Negative Rate (bad→good)
+Total Errors,56,59,Total misclassifications
+Error Rate,28.0%,29.5%,Overall error rate
