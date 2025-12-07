@@ -1,0 +1,20 @@
+Dimension,Classical SVM,Quantum SVM,Winner / Comment
+Classification Performance,,,
+Accuracy,70.00%,70.50%,Quantum (+0.5%)
+Precision,75.00%,70.77%,Classical (+4.2%)
+Recall,85.71%,98.57%,Quantum (+12.9%)
+F1-Score,80.00%,82.39%,Quantum (+2.4%)
+,,,
+Computational Efficiency,,,
+Training Time,0.05s,774.72s,"Classical (15,494x faster)"
+Prediction Time,0.003s,409.40s,"Classical (136,467x faster)"
+Total Runtime,0.08s,"1,184.13s","Classical (14,801x faster)"
+,,,
+Error Analysis,,,
+False Negatives (FN),19 (high risk),2 (very low risk),Quantum (89% reduction)
+False Positives (FP),37 (moderate),57 (higher),Classical (35% fewer)
+Type II Error Rate,13.6%,1.4%,Quantum (89% reduction)
+,,,
+Business Impact,,,
+Risk Profile,Balanced,Risk-averse,Different strategies
+Suitable For,Standard lending,Conservative lending,Depends on risk tolerance
