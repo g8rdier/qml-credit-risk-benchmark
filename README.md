@@ -1,586 +1,580 @@
-# Quantum vs Classical SVM Credit Risk Classification: Empirical Benchmark Study
+# Quantum vs. Klassisch SVM Kreditrisiko-Klassifikation: Empirische Benchmark-Studie
 
-## Table of Contents
-- [Academic Context](#academic-context)
-- [Research Question](#research-question)
-- [Hypothesis](#hypothesis)
-- [Dataset Characteristics](#dataset-characteristics)
-- [Project Architecture](#project-architecture)
-- [Key Features](#key-features)
+## Inhaltsverzeichnis
+- [Akademischer Kontext](#akademischer-kontext)
+- [Forschungsfrage](#forschungsfrage)
+- [Hypothesen](#hypothesen)
+- [Datensatz-Eigenschaften](#datensatz-eigenschaften)
+- [Projektarchitektur](#projektarchitektur)
+- [Hauptfunktionen](#hauptfunktionen)
 - [Installation](#installation)
-- [Usage](#usage)
-  - [Quick Start](#quick-start)
-  - [Scalability Testing](#scalability-testing-subset-mode)
-  - [Interactive Exploration (Jupyter Notebook)](#interactive-exploration-jupyter-notebook)
-  - [Advanced Usage](#advanced-usage)
-- [Glossary for Beginners](#glossary-for-beginners)
-  - [Machine Learning Concepts](#machine-learning-concepts)
-  - [Performance Metrics Explained](#performance-metrics-explained)
-  - [Quantum Computing Concepts](#quantum-computing-concepts)
-- [Evaluation Metrics](#evaluation-metrics)
-- [Experimental Results](#experimental-results)
-  - [Performance Comparison](#performance-comparison)
-  - [Computational Efficiency](#computational-efficiency)
-  - [Key Findings](#key-findings)
-  - [Scalability Analysis](#scalability-analysis)
-  - [Visualizations](#visualizations)
-- [Technical Notes](#technical-notes)
-  - [PCA Component Selection](#pca-component-selection)
-  - [Kernel Comparison](#kernel-comparison)
-- [Troubleshooting](#troubleshooting)
-- [Development](#development)
-- [References](#references)
-- [Author](#author)
-- [License](#license)
+- [Verwendung](#verwendung)
+  - [Schnellstart](#schnellstart)
+  - [Skalierbarkeitstest](#skalierbarkeitstest-subset-modus)
+  - [Interaktive Exploration (Jupyter Notebook)](#interaktive-exploration-jupyter-notebook)
+  - [Erweiterte Nutzung](#erweiterte-nutzung)
+- [Glossar für Einsteiger](#glossar-für-einsteiger)
+  - [Machine Learning Konzepte](#machine-learning-konzepte)
+  - [Leistungsmetriken erklärt](#leistungsmetriken-erklärt)
+  - [Quantencomputing-Konzepte](#quantencomputing-konzepte)
+- [Evaluationsmetriken](#evaluationsmetriken)
+- [Experimentelle Ergebnisse](#experimentelle-ergebnisse)
+  - [Leistungsvergleich](#leistungsvergleich)
+  - [Recheneffizienz](#recheneffizienz)
+  - [Kernerkenntnisse](#kernerkenntnisse)
+  - [Skalierbarkeitsanalyse](#skalierbarkeitsanalyse)
+  - [Visualisierungen](#visualisierungen)
+- [Technische Hinweise](#technische-hinweise)
+  - [PCA-Komponentenauswahl](#pca-komponentenauswahl)
+  - [Kernel-Vergleich](#kernel-vergleich)
+- [Fehlerbehebung](#fehlerbehebung)
+- [Entwicklung](#entwicklung)
+- [Referenzen](#referenzen)
+- [Autor](#autor)
+- [Lizenz](#lizenz)
 
 ---
 
-## Academic Context
+## Akademischer Kontext
 
-- **Course:** Business Intelligence 2, 6th Semester
-- **Institution:** IU International University of Applied Sciences
-- **Supervisor:** Dr. Stefan Nisch
+- **Kurs:** Business Intelligence 2, 6. Semester
+- **Institution:** IU Internationale Hochschule
+- **Betreuer:** Dr. Stefan Nisch
 - **Student:** Gregor Kobilarov
-- **Dataset:** German Credit Risk Dataset (OpenML, n=1,000)
-- **Primary Contribution:** Production-ready QML benchmark with modern tooling (pixi) comparing quantum and classical SVM performance on structured financial data
+- **Datensatz:** German Credit Risk Dataset (OpenML, n=1.000)
+- **Hauptbeitrag:** Produktionsreifer QML-Benchmark mit modernem Tooling (pixi), der Quantum- und klassische SVM-Leistung auf strukturierten Finanzdaten vergleicht
 
-## Research Question
+## Forschungsfrage
 
-> "To what extent can Quantum Machine Learning (QML) approaches, specifically Quantum Support Vector Machines (QSVM), deliver comparable or better classification results on structured financial data than classical methods today?"
+> „Inwieweit können Quantum Machine Learning (QML)-Ansätze, speziell Quantum Support Vector Machines (QSVM), auf strukturierten Finanzdaten vergleichbare oder bessere Klassifikationsergebnisse liefern als klassische Methoden?"
 
-## Hypothesis
+## Hypothesen
 
-### Null Hypotheses (H0)
+### Nullhypothesen (H0)
 
-**H0₁ (Performance):** There is no significant difference in classification performance (F1-score) between Quantum SVM and Classical SVM on the German Credit Risk dataset.
-- Formally: μ_F1(QSVM) = μ_F1(Classical SVM)
+**H0₁ (Leistung):** Es gibt keinen signifikanten Unterschied in der Klassifikationsleistung (F1-Wert) zwischen Quantum SVM und klassischer SVM auf dem German Credit Risk Datensatz.
+- Formal: μ_F1(QSVM) = μ_F1(Klassisch SVM)
 
-**H0₂ (Computational Efficiency):** Quantum SVM requires equal or less computational time compared to Classical SVM for training and prediction.
-- Formally: T_total(QSVM) ≤ T_total(Classical SVM)
+**H0₂ (Recheneffizienz):** Quantum SVM benötigt gleich viel oder weniger Rechenzeit als klassische SVM für Training und Vorhersage.
+- Formal: T_total(QSVM) ≤ T_total(Klassisch SVM)
 
-### Alternative Hypotheses (H1)
+### Alternativhypothesen (H1)
 
-**H1₁ (Performance):** Quantum SVM achieves significantly different classification performance compared to Classical SVM.
-- Formally: μ_F1(QSVM) ≠ μ_F1(Classical SVM)
+**H1₁ (Leistung):** Quantum SVM erreicht signifikant unterschiedliche Klassifikationsleistung im Vergleich zur klassischen SVM.
+- Formal: μ_F1(QSVM) ≠ μ_F1(Klassisch SVM)
 
-**H1₂ (Computational Efficiency):** Quantum SVM requires significantly more computational time than Classical SVM due to quantum state simulation overhead.
-- Formally: T_total(QSVM) > T_total(Classical SVM)
+**H1₂ (Recheneffizienz):** Quantum SVM benötigt signifikant mehr Rechenzeit als klassische SVM aufgrund des Overheads der Quantenzustandssimulation.
+- Formal: T_total(QSVM) > T_total(Klassisch SVM)
 
-### Expected Outcome
-QSVM achieves similar accuracy in high-dimensional quantum feature spaces but requires exponentially more computational time in simulation due to quantum state vector simulation overhead (2^n complexity).
+### Erwartetes Ergebnis
+QSVM erreicht ähnliche Genauigkeit in hochdimensionalen Quanten-Feature-Räumen, benötigt aber exponentiell mehr Rechenzeit in der Simulation aufgrund des Quantenzustandsvektor-Simulations-Overheads (2^n Komplexität).
 
-## Dataset Characteristics
+## Datensatz-Eigenschaften
 
 **German Credit Risk Dataset**
-- **Source:** OpenML (credit-g, dataset version 1)
-- **Samples:** 1,000 credit applications
-- **Features:** 20 attributes (7 numeric, 13 categorical)
-- **Target:** Binary classification (Good Credit: 700, Bad Credit: 300)
-- **Task:** Predict creditworthiness based on applicant attributes
+- **Quelle:** OpenML (credit-g, Dataset-Version 1)
+- **Stichproben:** 1.000 Kreditanträge
+- **Merkmale:** 20 Attribute (7 numerisch, 13 kategorial)
+- **Zielvariable:** Binäre Klassifikation (Guter Kredit: 700, Schlechter Kredit: 300)
+- **Aufgabe:** Vorhersage der Kreditwürdigkeit basierend auf Antragstellermerkmalen
 
-## Project Architecture
+## Projektarchitektur
 
 ```
 qml-credit-risk-benchmark/
 ├── src/
 │   ├── __init__.py
-│   ├── data_loader.py          # Data loading from OpenML/CSV
-│   ├── preprocessing.py        # Cleaning, encoding, scaling, PCA
-│   ├── classical_svm.py        # Classical SVM implementation
-│   └── quantum_svm.py          # QSVM implementation
+│   ├── data_loader.py          # Datenladen von OpenML/CSV
+│   ├── preprocessing.py        # Bereinigung, Encoding, Skalierung, PCA
+│   ├── classical_svm.py        # Klassische SVM-Implementierung
+│   └── quantum_svm.py          # QSVM-Implementierung
 ├── data/
-│   ├── raw/                    # Raw data files
-│   └── processed/              # Preprocessed data
-├── models/                     # Saved models and preprocessors
-├── results/                    # Plots and result files
-├── notebooks/                  # Jupyter notebooks for exploration
-├── main.py                     # Main execution script
-├── pixi.toml                   # Pixi dependency configuration
-├── pixi.lock                   # Locked dependency versions
+│   ├── raw/                    # Rohdaten
+│   └── processed/              # Vorverarbeitete Daten
+├── models/                     # Gespeicherte Modelle und Präprozessoren
+├── results/                    # Plots und Ergebnisdateien
+├── notebooks/                  # Jupyter Notebooks zur Exploration
+├── main.py                     # Hauptausführungsskript
+├── pixi.toml                   # Pixi-Abhängigkeitskonfiguration
+├── pixi.lock                   # Gesperrte Abhängigkeitsversionen
 └── README.md
 ```
 
-## Key Features
+## Hauptfunktionen
 
-### Modular Design
-- **Data Loader**: Fetches data from OpenML or loads from CSV
-- **Preprocessor**: Handles missing values, encoding, scaling, and PCA
-- **Classical SVM**: Scikit-learn based with multiple kernel options
-- **Quantum SVM**: Qiskit-based quantum kernel with caching support
+### Modularer Aufbau
+- **Data Loader**: Lädt Daten von OpenML oder aus CSV
+- **Preprocessor**: Behandelt fehlende Werte, Encoding, Skalierung und PCA
+- **Klassische SVM**: Scikit-learn-basiert mit mehreren Kernel-Optionen
+- **Quantum SVM**: Qiskit-basierter Quanten-Kernel mit Caching-Unterstützung
 
-### Critical Pre-processing Pipeline
+### Kritische Vorverarbeitungs-Pipeline
 
-1. **Missing Value Handling**
-   - Numeric: Median imputation
-   - Categorical: Mode imputation
+1. **Behandlung fehlender Werte**
+   - Numerisch: Median-Imputation
+   - Kategorial: Modus-Imputation
 
-2. **Categorical Encoding**
-   - One-hot encoding with drop_first=True
+2. **Kategoriales Encoding**
+   - One-Hot-Encoding mit drop_first=True
 
-3. **Feature Scaling**
-   - StandardScaler (critical for SVM performance)
+3. **Feature-Skalierung**
+   - StandardScaler (kritisch für SVM-Leistung)
 
-4. **Dimensionality Reduction (PCA)**
-   - Reduces features to match available qubits
-   - Default: 4 components (4-qubit QSVM)
-   - Configurable: 2-20 components
+4. **Dimensionsreduktion (PCA)**
+   - Reduziert Features passend zur verfügbaren Qubit-Anzahl
+   - Standard: 4 Komponenten (4-Qubit QSVM)
+   - Konfigurierbar: 2-20 Komponenten
 
-**Why PCA is Critical:**
-- Quantum simulators are limited by qubit count
-- Each feature requires 1 qubit in quantum feature map
-- PCA preserves maximum variance while reducing dimensions
+**Warum PCA kritisch ist:**
+- Quantensimulatoren sind durch die Qubit-Anzahl begrenzt
+- Jedes Feature benötigt 1 Qubit in der Quanten-Feature-Map
+- PCA erhält maximale Varianz bei reduzierter Dimension
 
 ## Installation
 
-### Prerequisites
-- [pixi](https://pixi.sh) package manager (recommended)
-- OR Python 3.11+ with pip (alternative)
+### Voraussetzungen
+- [pixi](https://pixi.sh) Paketmanager (empfohlen)
+- ODER Python 3.11+ mit pip (alternativ)
 
-### Setup with Pixi (Recommended)
+### Setup mit Pixi (Empfohlen)
 
 ```bash
-# Install pixi if not already installed
+# Pixi installieren falls nicht vorhanden
 curl -fsSL https://pixi.sh/install.sh | bash
 
-# Clone the repository
+# Repository klonen
 git clone <repository-url>
 cd qml-credit-risk-benchmark
 
-# Install all dependencies automatically
+# Alle Abhängigkeiten automatisch installieren
 pixi install
 
-# Run commands using pixi
+# Befehle mit pixi ausführen
 pixi run python main.py --mode classical
 ```
 
-**Why pixi?** Pixi provides reproducible dependency management, cross-platform compatibility, and automatic environment handling without manual virtual environment setup.
+**Warum pixi?** Pixi bietet reproduzierbares Abhängigkeitsmanagement, plattformübergreifende Kompatibilität und automatische Umgebungsverwaltung ohne manuelles Virtual-Environment-Setup.
 
-### Alternative Setup (pip)
+### Alternatives Setup (pip)
 
 ```bash
-# Clone the repository
+# Repository klonen
 git clone <repository-url>
 cd qml-credit-risk-benchmark
 
-# Create virtual environment
+# Virtuelle Umgebung erstellen
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Unter Windows: venv\Scripts\activate
 
-# Install dependencies manually
+# Abhängigkeiten manuell installieren
 pip install scikit-learn qiskit qiskit-machine-learning pandas numpy matplotlib seaborn
 ```
 
-## Usage
+## Verwendung
 
-### Quick Start
+### Schnellstart
 
 ```bash
-# Run classical SVM with default settings (4 PCA components)
+# Klassische SVM mit Standardeinstellungen ausführen (4 PCA-Komponenten)
 pixi run python main.py --mode classical
 
-# Run quantum SVM with 4 qubits (full dataset)
+# Quantum SVM mit 4 Qubits ausführen (vollständiger Datensatz)
 pixi run python main.py --mode quantum --n-components 4
 
-# Compare classical vs quantum (full analysis)
+# Klassisch vs. Quantum vergleichen (vollständige Analyse)
 pixi run python main.py --mode compare --n-components 4
 
-# Compare different classical kernel types
+# Verschiedene klassische Kernel-Typen vergleichen
 pixi run python main.py --mode classical --compare-kernels
 ```
 
-### Scalability Testing (Subset Mode)
+### Skalierbarkeitstest (Subset-Modus)
 
-For testing with higher qubit counts where full dataset simulation is infeasible:
+Für Tests mit höheren Qubit-Zahlen, bei denen die vollständige Datensatz-Simulation nicht durchführbar ist:
 
 ```bash
-# Test 8-qubit quantum circuit with reduced dataset
+# 8-Qubit Quantenschaltung mit reduziertem Datensatz testen
 pixi run python main.py --mode quantum --n-components 8 --subset-size 200
 
-# Compare classical vs quantum with subset (stratified sampling)
+# Klassisch vs. Quantum mit Subset vergleichen (stratifizierte Stichprobe)
 pixi run python main.py --mode compare --n-components 8 --subset-size 250
 ```
 
-The `--subset-size` parameter enables stratified subsampling while preserving class distribution. This is useful for proof-of-concept experiments with higher dimensional quantum circuits that would otherwise cause computational infeasibility on consumer hardware.
+Der `--subset-size` Parameter ermöglicht stratifizierte Unterstichproben unter Beibehaltung der Klassenverteilung. Dies ist nützlich für Proof-of-Concept-Experimente mit höherdimensionalen Quantenschaltungen, die sonst auf Consumer-Hardware rechnerisch nicht durchführbar wären.
 
-### Interactive Exploration (Jupyter Notebook)
+### Interaktive Exploration (Jupyter Notebook)
 
-For interactive data exploration and classical SVM experimentation:
+Für interaktive Datenexploration und klassische SVM-Experimente:
 
 ```bash
-# Launch Jupyter notebook with pixi
+# Jupyter Notebook mit pixi starten
 pixi run jupyter notebook notebooks/01_classical_svm_exploration.ipynb
 
-# Alternative: open directly in VS Code with the Jupyter extension
+# Alternativ: Direkt in VS Code mit der Jupyter-Erweiterung öffnen
 code notebooks/01_classical_svm_exploration.ipynb
 ```
 
-**What the notebook provides:**
-- Interactive data visualization and PCA analysis
-- Kernel comparison experiments (RBF, linear, poly)
-- Hyperparameter tuning (C values, component counts)
-- Step-by-step walkthrough of the preprocessing pipeline
-- Real-time plotting of confusion matrices, ROC curves, and performance metrics
+**Was das Notebook bietet:**
+- Interaktive Datenvisualisierung und PCA-Analyse
+- Kernel-Vergleichsexperimente (RBF, linear, poly)
+- Hyperparameter-Tuning (C-Werte, Komponentenanzahl)
+- Schritt-für-Schritt-Durchgang der Vorverarbeitungs-Pipeline
+- Echtzeit-Plotting von Konfusionsmatrizen, ROC-Kurven und Leistungsmetriken
 
-**When to use it:**
-- Exploring the dataset characteristics before running experiments
-- Testing different preprocessing configurations interactively
-- Understanding how PCA component selection affects model performance
-- Experimenting with classical SVM kernels without waiting for full pipeline runs
+**Wann es zu verwenden ist:**
+- Exploration der Datensatz-Eigenschaften vor dem Ausführen von Experimenten
+- Interaktives Testen verschiedener Vorverarbeitungskonfigurationen
+- Verständnis, wie die PCA-Komponentenauswahl die Modellleistung beeinflusst
+- Experimentieren mit klassischen SVM-Kerneln ohne auf vollständige Pipeline-Läufe zu warten
 
-### Advanced Usage
+### Erweiterte Nutzung
 
-#### Using Individual Modules
+#### Verwendung einzelner Module
 
-**Data Loading:**
+**Datenladen:**
 ```python
 from src.data_loader import load_credit_data
 
-# Load from OpenML
+# Von OpenML laden
 X, y = load_credit_data("openml")
 
-# Load from CSV
-X, y = load_credit_data("path/to/data.csv")
+# Von CSV laden
+X, y = load_credit_data("pfad/zu/daten.csv")
 ```
 
-**Preprocessing:**
+**Vorverarbeitung:**
 ```python
 from src.preprocessing import CreditDataPreprocessor
 
 preprocessor = CreditDataPreprocessor(n_components=4)
 X_train, X_test, y_train, y_test = preprocessor.preprocess_data(X, y)
 
-# Save preprocessor for later use
+# Präprozessor für spätere Verwendung speichern
 preprocessor.save_preprocessor("models/preprocessor.pkl")
 ```
 
-**Classical SVM:**
+**Klassische SVM:**
 ```python
 from src.classical_svm import ClassicalSVM
 
-# Train model
+# Modell trainieren
 svm = ClassicalSVM(kernel='rbf', C=1.0)
 svm.train(X_train, y_train)
 
-# Evaluate
+# Evaluieren
 metrics = svm.evaluate(X_test, y_test)
 
-# Generate visualizations
+# Visualisierungen generieren
 svm.plot_confusion_matrix(X_test, y_test)
 svm.plot_roc_curve(X_test, y_test)
 
-# Save model
+# Modell speichern
 svm.save_model("models/classical_svm.pkl")
 ```
 
-## Glossary for Beginners
+## Glossar für Einsteiger
 
-If you're new to machine learning or quantum computing, here are the key terms explained:
+Falls Sie neu im Bereich Machine Learning oder Quantencomputing sind, hier die wichtigsten Begriffe erklärt:
 
-### Machine Learning Concepts
+### Machine Learning Konzepte
 
-**Classification**
-- Task of predicting which category something belongs to (e.g., "good credit" vs "bad credit")
-- The model learns patterns from labeled examples (training data) and applies them to new cases
+**Klassifikation**
+- Aufgabe, vorherzusagen, zu welcher Kategorie etwas gehört (z.B. "guter Kredit" vs. "schlechter Kredit")
+- Das Modell lernt Muster aus gelabelten Beispielen (Trainingsdaten) und wendet sie auf neue Fälle an
 
 **Support Vector Machine (SVM)**
-- A classification algorithm that finds the best boundary (hyperplane) to separate different categories
-- Works by maximizing the margin (distance) between the boundary and the nearest data points from each class
-- Can handle non-linear patterns using "kernel tricks"
+- Ein Klassifikationsalgorithmus, der die beste Grenze (Hyperebene) findet, um verschiedene Kategorien zu trennen
+- Funktioniert durch Maximierung des Abstands (Margin) zwischen der Grenze und den nächsten Datenpunkten jeder Klasse
+- Kann nicht-lineare Muster durch "Kernel-Tricks" behandeln
 
 **Kernel**
-- A mathematical function that transforms data into a higher-dimensional space
-- Allows SVMs to find complex, non-linear decision boundaries
-- Common kernels: Linear (straight line), RBF (curved boundary), Polynomial (curved with specific shape)
+- Eine mathematische Funktion, die Daten in einen höherdimensionalen Raum transformiert
+- Ermöglicht SVMs, komplexe, nicht-lineare Entscheidungsgrenzen zu finden
+- Gängige Kernel: Linear (gerade Linie), RBF (gekrümmte Grenze), Polynomial (gekrümmt mit spezifischer Form)
 
-**Training vs Testing**
-- **Training data:** Examples the model learns from (80% of dataset in this project)
-- **Testing data:** Examples used to evaluate the model's performance on unseen data (20% of dataset)
-- This split ensures the model can generalize, not just memorize
+**Training vs. Test**
+- **Trainingsdaten:** Beispiele, von denen das Modell lernt (80% des Datensatzes in diesem Projekt)
+- **Testdaten:** Beispiele zur Bewertung der Modellleistung auf ungesehenen Daten (20% des Datensatzes)
+- Diese Aufteilung stellt sicher, dass das Modell generalisieren kann, nicht nur auswendig lernt
 
-**Feature**
-- An individual measurable property used for prediction (e.g., age, income, loan amount)
-- Original dataset has 20 features; we reduce to 4 using PCA for quantum compatibility
+**Feature (Merkmal)**
+- Eine einzelne messbare Eigenschaft, die für die Vorhersage verwendet wird (z.B. Alter, Einkommen, Kreditsumme)
+- Der ursprüngliche Datensatz hat 20 Features; wir reduzieren auf 4 mittels PCA für Quantenkompatibilität
 
-**Principal Component Analysis (PCA)**
-- A technique to reduce the number of features while keeping the most important information
-- Combines correlated features into fewer "principal components"
-- Example: Instead of tracking "height" and "weight" separately, create a single "size" component
+**Hauptkomponentenanalyse (PCA)**
+- Eine Technik zur Reduzierung der Feature-Anzahl unter Beibehaltung der wichtigsten Informationen
+- Kombiniert korrelierte Features zu weniger "Hauptkomponenten"
+- Beispiel: Statt "Größe" und "Gewicht" separat zu verfolgen, eine einzelne "Körpergröße"-Komponente erstellen
 
-### Performance Metrics Explained
+### Leistungsmetriken erklärt
 
-**Confusion Matrix Terms:**
-- **True Positive (TP):** Correctly predicted "good credit"
-- **True Negative (TN):** Correctly predicted "bad credit"
-- **False Positive (FP):** Predicted "good" but actually "bad" (approved a risky loan)
-- **False Negative (FN):** Predicted "bad" but actually "good" (rejected a safe loan)
+**Konfusionsmatrix-Begriffe:**
+- **Richtig Positiv (TP):** Korrekt als "guter Kredit" vorhergesagt
+- **Richtig Negativ (TN):** Korrekt als "schlechter Kredit" vorhergesagt
+- **Falsch Positiv (FP):** Als "gut" vorhergesagt, aber tatsächlich "schlecht" (riskanter Kredit bewilligt)
+- **Falsch Negativ (FN):** Als "schlecht" vorhergesagt, aber tatsächlich "gut" (sicherer Kredit abgelehnt)
 
-**Accuracy**
-- Formula: (TP + TN) / Total predictions
-- What it means: Percentage of all predictions that were correct
-- Limitation: Can be misleading with imbalanced datasets (e.g., if 90% are "good credit", predicting "good" for everything gives 90% accuracy)
+**Genauigkeit (Accuracy)**
+- Formel: (TP + TN) / Gesamtvorhersagen
+- Bedeutung: Prozentsatz aller Vorhersagen, die korrekt waren
+- Einschränkung: Kann bei unbalancierten Datensätzen irreführend sein (z.B. wenn 90% "guter Kredit" sind, ergibt "gut" für alles vorhersagen 90% Genauigkeit)
 
-**Precision**
-- Formula: TP / (TP + FP)
-- What it means: Of all loans we approved, what percentage were actually good?
-- High precision = Few false positives = Conservative lending (reject doubtful cases)
+**Präzision**
+- Formel: TP / (TP + FP)
+- Bedeutung: Von allen bewilligten Krediten, welcher Prozentsatz war tatsächlich gut?
+- Hohe Präzision = Wenige Falsch-Positive = Konservative Kreditvergabe (zweifelhafte Fälle ablehnen)
 
-**Recall**
-- Formula: TP / (TP + FN)
-- What it means: Of all actual good credits, what percentage did we correctly identify?
-- High recall = Few false negatives = Aggressive lending (approve most cases)
+**Recall (Trefferquote)**
+- Formel: TP / (TP + FN)
+- Bedeutung: Von allen tatsächlich guten Krediten, welchen Prozentsatz haben wir korrekt identifiziert?
+- Hoher Recall = Wenige Falsch-Negative = Aggressive Kreditvergabe (die meisten Fälle genehmigen)
 
-**F1-Score**
-- Formula: 2 × (Precision × Recall) / (Precision + Recall)
-- What it means: Balanced metric that considers both precision and recall
-- Useful when you care equally about false positives and false negatives
-- Range: 0 (worst) to 1 (perfect)
+**F1-Wert**
+- Formel: 2 × (Präzision × Recall) / (Präzision + Recall)
+- Bedeutung: Ausgewogene Metrik, die sowohl Präzision als auch Recall berücksichtigt
+- Nützlich, wenn Falsch-Positive und Falsch-Negative gleich wichtig sind
+- Bereich: 0 (schlechtester) bis 1 (perfekt)
 
-**ROC AUC (Area Under Curve)**
-- Measures the model's ability to distinguish between classes across all threshold settings
-- Range: 0.5 (random guessing) to 1.0 (perfect classification)
-- Higher is better
+**ROC AUC (Fläche unter der Kurve)**
+- Misst die Fähigkeit des Modells, zwischen Klassen über alle Schwellenwerteinstellungen zu unterscheiden
+- Bereich: 0,5 (Raten) bis 1,0 (perfekte Klassifikation)
+- Höher ist besser
 
-### Quantum Computing Concepts
+### Quantencomputing-Konzepte
 
 **Qubit**
-- The quantum equivalent of a classical bit
-- Unlike classical bits (0 or 1), qubits can be in superposition (both 0 and 1 simultaneously)
-- This allows quantum computers to explore multiple possibilities at once
+- Das Quanten-Äquivalent eines klassischen Bits
+- Anders als klassische Bits (0 oder 1) können Qubits in Superposition sein (gleichzeitig 0 und 1)
+- Dies ermöglicht Quantencomputern, mehrere Möglichkeiten gleichzeitig zu erkunden
 
-**Quantum Circuit**
-- A sequence of quantum operations (gates) applied to qubits
-- Analogous to a classical computer program but for quantum hardware
-- In this project, circuits encode credit risk data into quantum states
+**Quantenschaltung**
+- Eine Sequenz von Quantenoperationen (Gates), die auf Qubits angewendet werden
+- Analog zu einem klassischen Computerprogramm, aber für Quantenhardware
+- In diesem Projekt kodieren Schaltungen Kreditrisikodaten in Quantenzustände
 
-**Quantum Feature Map**
-- Encodes classical data (credit features) into quantum states
-- Creates a high-dimensional quantum representation of the data
-- Allows quantum algorithms to find patterns classical algorithms might miss
+**Quanten-Feature-Map**
+- Kodiert klassische Daten (Kredit-Features) in Quantenzustände
+- Erstellt eine hochdimensionale Quantendarstellung der Daten
+- Ermöglicht Quantenalgorithmen, Muster zu finden, die klassische Algorithmen möglicherweise übersehen
 
-**Quantum Kernel**
-- Measures similarity between data points in quantum feature space
-- Computed by running quantum circuits and measuring overlap between quantum states
-- Replaces classical kernel computation in quantum SVM
+**Quanten-Kernel**
+- Misst die Ähnlichkeit zwischen Datenpunkten im Quanten-Feature-Raum
+- Berechnet durch Ausführen von Quantenschaltungen und Messen der Überlappung zwischen Quantenzuständen
+- Ersetzt die klassische Kernel-Berechnung in Quantum SVM
 
-**Quantum Simulation**
-- Running quantum algorithms on classical computers by explicitly tracking all quantum states
-- Exponentially expensive: 4 qubits = 16 states, 8 qubits = 256 states, 20 qubits = 1 million states
-- Why real quantum hardware is needed for practical applications
+**Quantensimulation**
+- Ausführen von Quantenalgorithmen auf klassischen Computern durch explizites Verfolgen aller Quantenzustände
+- Exponentiell teuer: 4 Qubits = 16 Zustände, 8 Qubits = 256 Zustände, 20 Qubits = 1 Million Zustände
+- Warum echte Quantenhardware für praktische Anwendungen benötigt wird
 
-**Hilbert Space**
-- The mathematical space where quantum states exist
-- Exponentially large compared to classical state space
-- Quantum advantage comes from exploring this massive space efficiently
+**Hilbert-Raum**
+- Der mathematische Raum, in dem Quantenzustände existieren
+- Exponentiell größer im Vergleich zum klassischen Zustandsraum
+- Quantenvorteil kommt vom effizienten Erkunden dieses massiven Raums
 
-### This Project's Approach
+### Ansatz dieses Projekts
 
-**Classical SVM:** Uses traditional RBF kernel on 4 PCA-reduced features
-- Fast (0.05 seconds training)
-- Well-understood and proven
-- Good baseline performance
+**Klassische SVM:** Verwendet traditionellen RBF-Kernel auf 4 PCA-reduzierten Features
+- Schnell (0,048 Sekunden Training)
+- Gut verstanden und bewährt
+- Gute Baseline-Leistung
 
-**Quantum SVM:** Uses quantum kernel with 4-qubit quantum circuits
-- Slow in simulation (774 seconds training)
-- Explores quantum feature space
-- Marginal performance improvement in this experiment
+**Quantum SVM:** Verwendet Quanten-Kernel mit 4-Qubit Quantenschaltungen
+- Langsam in der Simulation (382 Sekunden Training)
+- Erkundet Quanten-Feature-Raum
+- Marginale Leistungsverbesserung in diesem Experiment
 
-**The Comparison:** Tests whether quantum provides practical advantages for credit risk classification on current (simulated) quantum hardware.
+**Der Vergleich:** Testet, ob Quantum praktische Vorteile für die Kreditrisiko-Klassifikation auf aktueller (simulierter) Quantenhardware bietet.
 
-## Evaluation Metrics
+## Evaluationsmetriken
 
-The project tracks the following metrics for comparison:
+Das Projekt verfolgt die folgenden Metriken zum Vergleich:
 
-| Metric | Description | Importance |
-|--------|-------------|------------|
-| **Accuracy** | Overall correctness | Primary metric |
-| **Precision** | Positive predictive value | Important for credit risk |
-| **Recall** | True positive rate | Critical for identifying good credits |
-| **F1-Score** | Harmonic mean of precision/recall | Balanced performance |
-| **ROC AUC** | Area under ROC curve | Model discrimination ability |
-| **Training Time** | Time to fit model | Computational cost |
-| **Prediction Time** | Time for inference | Deployment feasibility |
+| Metrik | Beschreibung | Wichtigkeit |
+|--------|--------------|-------------|
+| **Genauigkeit** | Gesamtkorrektheit | Primäre Metrik |
+| **Präzision** | Positiver Vorhersagewert | Wichtig für Kreditrisiko |
+| **Recall** | Richtig-Positiv-Rate | Kritisch für Identifikation guter Kredite |
+| **F1-Wert** | Harmonisches Mittel von Präzision/Recall | Ausgewogene Leistung |
+| **ROC AUC** | Fläche unter ROC-Kurve | Modelldiskriminierungsfähigkeit |
+| **Trainingszeit** | Zeit zum Anpassen des Modells | Rechenkosten |
+| **Vorhersagezeit** | Zeit für Inferenz | Einsatzfähigkeit |
 
-## Experimental Results
+## Experimentelle Ergebnisse
 
-### Performance Comparison
+### Leistungsvergleich
 
-| Metric | Classical SVM | Quantum SVM | Winner |
-|--------|---------------|-------------|---------|
-| **Accuracy** | 70.00% | 70.50% | Quantum (+0.5%) |
-| **Precision** | 75.00% | 70.77% | Classical |
-| **Recall** | 85.71% | 98.57% | Quantum |
-| **F1-Score** | 80.00% | 82.39% | Quantum (+2.4%) |
+| Metrik | Klassische SVM | Quantum SVM | Gewinner |
+|--------|----------------|-------------|----------|
+| **Genauigkeit** | 70,00% | 70,50% | Quantum (+0,5%) |
+| **Präzision** | 75,00% | 70,77% | Klassisch |
+| **Recall** | 85,71% | 98,57% | Quantum |
+| **F1-Wert** | 80,00% | 82,39% | Quantum (+2,4%) |
 
-### Computational Efficiency
+### Recheneffizienz
 
-| Operation | Classical SVM | Quantum SVM | Speedup |
-|-----------|---------------|-------------|---------|
-| **Training** | 0.05s | 774.72s | Classical 15,494x faster |
-| **Prediction** | 0.003s | 409.40s | Classical 136,467x faster |
-| **Total Time** | 0.08s | 1,184.13s | Classical 14,801x faster |
+| Operation | Klassische SVM | Quantum SVM | Speedup |
+|-----------|----------------|-------------|---------|
+| **Training** | 0,048s | 382,23s | Klassisch 7.963x schneller |
+| **Vorhersage** | 0,003s | 257,97s | Klassisch 85.990x schneller |
+| **Gesamtzeit** | 0,051s | 640,20s | Klassisch 12.553x schneller |
 
-**Methodology Note:** Quantum timing results reflect first-run performance without kernel caching. The quantum implementation includes a caching mechanism for kernel matrices (stored in `data/processed/`), which can speed up repeated experiments with identical parameters. However, all reported benchmarks use fresh kernel computation to ensure fair comparison with classical methods and represent realistic first-run performance.
+**Methodischer Hinweis:** Die Quantum-Zeitmessungen spiegeln die Erstlauf-Leistung ohne Kernel-Caching wider. Die Quantum-Implementierung enthält einen Caching-Mechanismus für Kernel-Matrizen (gespeichert in `data/processed/`), der wiederholte Experimente mit identischen Parametern beschleunigen kann. Alle berichteten Benchmarks verwenden jedoch frische Kernel-Berechnungen, um einen fairen Vergleich mit klassischen Methoden zu gewährleisten.
 
-### Key Findings
+### Kernerkenntnisse
 
-**Hypothesis Testing Results:**
+**Hypothesentest-Ergebnisse:**
 
-- **H0₁ (Performance)**: REJECTED - Quantum achieves marginally better F1-score (0.8239 vs 0.8000, +2.4% improvement), though difference is small and may not be statistically significant without repeated trials
-- **H0₂ (Computational Efficiency)**: REJECTED - Quantum is 14,801x slower (1,184s vs 0.08s), strongly supporting H1₂
-- **Overall**: Expected outcome validated - similar accuracy (~0.5% difference) but exponentially higher computational cost
+- **H0₁ (Leistung)**: ABGELEHNT - Quantum erreicht marginal besseren F1-Wert (0,8239 vs. 0,8000, +2,4% Verbesserung), obwohl der Unterschied klein ist und ohne wiederholte Versuche möglicherweise nicht statistisch signifikant ist
+- **H0₂ (Recheneffizienz)**: ABGELEHNT - Quantum ist 12.553x langsamer (640s vs. 0,05s), was H1₂ stark unterstützt
+- **Gesamt**: Erwartetes Ergebnis bestätigt - ähnliche Genauigkeit (~0,5% Unterschied) aber exponentiell höhere Rechenkosten
 
-**Detailed Results:**
+**Detaillierte Ergebnisse:**
 
-- **Performance**: Quantum achieves marginally better F1-score (2.4% improvement)
-- **Accuracy**: Near-identical performance validates hypothesis (~0.5% difference)
-- **Computational Cost**: Quantum is 14,801x slower due to simulation overhead
-- **Practical Conclusion**: Quantum simulation provides no practical advantage for production use
+- **Leistung**: Quantum erreicht marginal besseren F1-Wert (2,4% Verbesserung)
+- **Genauigkeit**: Nahezu identische Leistung bestätigt Hypothese (~0,5% Unterschied)
+- **Rechenkosten**: Quantum ist 12.553x langsamer aufgrund des Simulations-Overheads
+- **Praktische Schlussfolgerung**: Quantensimulation bietet keinen praktischen Vorteil für den Produktionseinsatz
 
 **Trade-offs:**
-- **Quantum**: Exceptional recall (98.57%) - catches almost all good credits but with more false positives
-- **Classical**: Higher precision (75.00%) - more conservative, fewer false positives
+- **Quantum**: Außergewöhnlicher Recall (98,57%) - erkennt fast alle guten Kredite, aber mit mehr Falsch-Positiven
+- **Klassisch**: Höhere Präzision (75,00%) - konservativer, weniger Falsch-Positive
 
-### Scalability Analysis
+### Skalierbarkeitsanalyse
 
-**8-Qubit Limitation (Exponential Barrier):**
+**8-Qubit-Limitation (Exponentielle Barriere):**
 
-Attempts to scale to 8 qubits revealed fundamental computational limits of classical quantum simulation:
+Versuche, auf 8 Qubits zu skalieren, zeigten fundamentale Rechengrenzen der klassischen Quantensimulation:
 
-- **State Vector Complexity**: 2^8 = 256 complex amplitudes per quantum state
-- **Kernel Matrix Computation**: 800×800 = 640,000 quantum circuit simulations required
-- **Resource Exhaustion**: System freeze after >60 minutes on consumer hardware (Intel i5, 32GB RAM)
-- **Subset Requirement**: Even with stratified subsampling (n=200, reducing to 25,600 simulations), runtime exceeded feasibility threshold
+- **Zustandsvektor-Komplexität**: 2^8 = 256 komplexe Amplituden pro Quantenzustand
+- **Kernel-Matrix-Berechnung**: 800×800 = 640.000 Quantenschaltungssimulationen erforderlich
+- **Ressourcenerschöpfung**: Systemeinfrieren nach >60 Minuten auf Consumer-Hardware (Intel i5, 32GB RAM)
+- **Subset-Erfordernis**: Selbst mit stratifizierter Unterstichprobe (n=200, reduziert auf 25.600 Simulationen) überschritt die Laufzeit die Machbarkeitsschwelle
 
-**Scientific Implication:**
+**Wissenschaftliche Implikation:**
 
-This empirical barrier confirms the exponential scaling problem of classical quantum simulation and demonstrates why **real quantum hardware** is necessary for practical QML applications beyond proof-of-concept demonstrations. The `--subset-size` parameter was implemented to enable controlled experiments, but fundamental physics limits classical simulation regardless of engineering optimizations.
+Diese empirische Barriere bestätigt das exponentielle Skalierungsproblem der klassischen Quantensimulation und demonstriert, warum **echte Quantenhardware** für praktische QML-Anwendungen jenseits von Proof-of-Concept-Demonstrationen notwendig ist.
 
-### Visualizations
+### Visualisierungen
 
-#### Comprehensive Comparison Summary
+#### Umfassende Vergleichsübersicht
 
-![Comparison Summary](results/comparison_summary.png)
+![Vergleichsübersicht](results/comparison_summary.png)
 
-The comprehensive comparison includes:
-- Performance metrics bar chart
-- Computational efficiency comparison (log scale)
-- Performance heatmap
-- Summary analysis for BI2 project
+Die umfassende Vergleichsübersicht enthält:
+- Leistungsmetriken-Balkendiagramm
+- Recheneffizienz-Vergleich (log. Skala)
+- Leistungs-Heatmap
+- Zusammenfassende Analyse für BI2-Projekt
 
-#### Deep Error Analysis
+#### ROC-Kurven-Vergleich
 
-![Error Analysis](results/error_analysis_comprehensive.png)
+![ROC-Kurven](results/roc_curve_comparison.png)
 
-**Error Pattern Analysis** reveals critical business insights:
-- **89.5% reduction in false negatives** (19 → 2 bad credits approved)
-- **Hypothetical business impact**: Using industry-typical assumptions (€10k avg loan, 80% default loss rate, 5% opportunity cost), this error reduction translates to ~€126k cost savings per 200 applications
-- **Trade-off**: 54% increase in false positives (more conservative lending)
-- **Risk profile comparison**: Quantum optimizes for recall (minimizing missed good credits), Classical balances precision/recall
+#### Precision-Recall-Kurve
 
-This visualization demonstrates that quantum SVM isn't just marginally better - it has a fundamentally different error profile suitable for risk-averse institutions.
+![Precision-Recall](results/precision_recall_comparison.png)
 
-*Note: Business impact figures are illustrative examples using representative industry parameters, not actual financial data from the dataset.*
+## Technische Hinweise
 
-## Technical Notes
+### PCA-Komponentenauswahl
 
-### PCA Component Selection
+| Komponenten | Erklärte Varianz | Anwendungsfall |
+|-------------|------------------|----------------|
+| 2 | ~40-50% | Minimale Quantenschaltung |
+| 4 | ~60-70% | Ausgewogen (empfohlen) |
+| 8 | ~80-90% | Maximaler Informationserhalt |
+| 16+ | ~95%+ | Nahezu Original-Leistung |
 
-| Components | Explained Variance | Use Case |
-|------------|-------------------|----------|
-| 2 | ~40-50% | Minimal quantum circuit |
-| 4 | ~60-70% | Balanced (recommended) |
-| 8 | ~80-90% | Maximum information retention |
-| 16+ | ~95%+ | Near-original performance |
+### Kernel-Vergleich
 
-### Kernel Comparison
-
-**Linear Kernel:**
-- Fast, interpretable
-- Good for linearly separable data
-- Lower computational cost
+**Linearer Kernel:**
+- Schnell, interpretierbar
+- Gut für linear trennbare Daten
+- Geringere Rechenkosten
 
 **RBF Kernel:**
-- Most flexible
-- Good default choice
-- Handles non-linear patterns
+- Am flexibelsten
+- Gute Standardwahl
+- Behandelt nicht-lineare Muster
 
-**Polynomial Kernel:**
-- Captures specific feature interactions
-- Can overfit with high degree
+**Polynomialer Kernel:**
+- Erfasst spezifische Feature-Interaktionen
+- Kann bei hohem Grad überanpassen
 
-**Quantum Kernel:**
-- Uses quantum feature map
-- Explores exponentially large Hilbert space
-- Computationally expensive in simulation
+**Quanten-Kernel:**
+- Verwendet Quanten-Feature-Map
+- Erkundet exponentiell großen Hilbert-Raum
+- Rechenintensiv in der Simulation
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Common Issues
+### Häufige Probleme
 
-**Issue**: `ModuleNotFoundError: No module named 'sklearn'` or similar dependency errors
-**Solution**: Ensure you're using pixi: `pixi install` or manually install dependencies with pip
+**Problem**: `ModuleNotFoundError: No module named 'sklearn'` oder ähnliche Abhängigkeitsfehler
+**Lösung**: Stellen Sie sicher, dass Sie pixi verwenden: `pixi install` oder installieren Sie Abhängigkeiten manuell mit pip
 
-**Issue**: Memory error during PCA
-**Solution**: Reduce `n_components` or use incremental PCA
+**Problem**: Speicherfehler während PCA
+**Lösung**: `n_components` reduzieren oder inkrementelle PCA verwenden
 
-**Issue**: Poor model performance
-**Solution**: Try different kernels with `--compare-kernels` flag
+**Problem**: Schlechte Modellleistung
+**Lösung**: Verschiedene Kernel mit `--compare-kernels` Flag ausprobieren
 
-**Issue**: Quantum implementation not working
-**Solution**: Verify Qiskit installation: `pixi list | grep qiskit` or reinstall with `pixi install`
+**Problem**: Quantum-Implementierung funktioniert nicht
+**Lösung**: Qiskit-Installation überprüfen: `pixi list | grep qiskit` oder mit `pixi install` neu installieren
 
-**Issue**: System freezes or becomes unresponsive with high qubit counts
-**Solution**: Use `--subset-size` parameter to reduce dataset size. Example: `--subset-size 200` for 8+ qubits. Note that classical quantum simulation has fundamental exponential scaling limits.
+**Problem**: System friert ein oder reagiert nicht bei hohen Qubit-Zahlen
+**Lösung**: `--subset-size` Parameter verwenden, um die Datensatzgröße zu reduzieren. Beispiel: `--subset-size 200` für 8+ Qubits. Beachten Sie, dass klassische Quantensimulation fundamentale exponentielle Skalierungsgrenzen hat.
 
-## Development
+## Entwicklung
 
-### Running Analysis Scripts
+### Analyse-Skripte ausführen
 
-Generate thesis-ready analysis and visualizations:
+Thesis-fertige Analysen und Visualisierungen generieren:
 
 ```bash
-# Run comprehensive analysis (confusion matrix, PCA, business impact)
+# Umfassende Analyse ausführen (Konfusionsmatrix, PCA, Business Impact)
 pixi run python analysis.py
 
-# Generate error analysis visualization
+# Fehleranalyse-Visualisierung generieren
 pixi run python create_error_analysis_plot.py
 ```
 
-Output files:
-- `results/thesis_summary_table.csv` - Ready for thesis tables
-- `results/confusion_matrix_comparison.csv` - Detailed error breakdown
-- `results/error_analysis_comprehensive.png` - Publication-quality visualization
+Ausgabedateien:
+- `results/thesis_summary_table.csv` - Fertig für Thesis-Tabellen
+- `results/confusion_matrix_comparison.csv` - Detaillierte Fehleraufschlüsselung
+- `results/error_analysis_comprehensive.png` - Publikationsqualität-Visualisierung
 
-### Running Tests
+### Tests ausführen
 ```bash
-# Test individual modules
+# Einzelne Module testen
 pixi run python src/data_loader.py
 pixi run python src/preprocessing.py
 pixi run python src/classical_svm.py
 ```
 
-### Code Style
-- Type hints for all function parameters
-- Docstrings in Google style
-- English comments
-- PEP 8 compliant
+### Code-Stil
+- Type Hints für alle Funktionsparameter
+- Docstrings im Google-Stil
+- Englische Kommentare
+- PEP 8 konform
 
-## References
+## Referenzen
 
 - German Credit Data: [OpenML](https://www.openml.org/d/31)
-- Qiskit Machine Learning: [Documentation](https://qiskit-community.github.io/qiskit-machine-learning/)
-- Scikit-learn SVM: [User Guide](https://scikit-learn.org/stable/modules/svm.html)
+- Qiskit Machine Learning: [Dokumentation](https://qiskit-community.github.io/qiskit-machine-learning/)
+- Scikit-learn SVM: [Benutzerhandbuch](https://scikit-learn.org/stable/modules/svm.html)
 
-## Author
+## Autor
 
 [Gregor Kobilarov](https://github.com/g8rdier)
 
-## License
+## Lizenz
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE)-Datei für Details.
 
-This project was created for educational purposes as part of a university course.
+Dieses Projekt wurde zu Bildungszwecken als Teil eines Universitätskurses erstellt.
 
 ---
 
-**Status**: Experimental Phase Complete | 4-Qubit Results Available | Documentation & Analysis Phase
+**Status**: Experimentelle Phase abgeschlossen | 4-Qubit-Ergebnisse verfügbar | Dokumentations- und Analysephase
