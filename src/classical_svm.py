@@ -203,12 +203,12 @@ class ClassicalSVM:
             annot=True,
             fmt='d',
             cmap='Blues',
-            xticklabels=['Bad Credit', 'Good Credit'],
-            yticklabels=['Bad Credit', 'Good Credit']
+            xticklabels=['Schlechter Kredit', 'Guter Kredit'],
+            yticklabels=['Schlechter Kredit', 'Guter Kredit']
         )
-        plt.title(f'Confusion Matrix - Classical SVM ({self.kernel} kernel)')
-        plt.ylabel('True Label')
-        plt.xlabel('Predicted Label')
+        plt.title(f'Konfusionsmatrix - Klassisch SVM ({self.kernel} Kernel)')
+        plt.ylabel('Tatsächliches Label')
+        plt.xlabel('Vorhergesagtes Label')
         plt.tight_layout()
 
         if save_path:
@@ -237,13 +237,13 @@ class ClassicalSVM:
         auc = roc_auc_score(y_test, y_proba)
 
         plt.figure(figsize=(8, 6))
-        plt.plot(fpr, tpr, linewidth=2, label=f'Classical SVM (AUC = {auc:.4f})')
-        plt.plot([0, 1], [0, 1], 'k--', linewidth=1, label='Random Classifier')
+        plt.plot(fpr, tpr, linewidth=2, label=f'Klassisch SVM (AUC = {auc:.4f})')
+        plt.plot([0, 1], [0, 1], 'k--', linewidth=1, label='Zufallsklassifikator')
         plt.xlim([0.0, 1.0])
         plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title(f'ROC Curve - Classical SVM ({self.kernel} kernel)')
+        plt.xlabel('Falsch-Positiv-Rate')
+        plt.ylabel('Richtig-Positiv-Rate')
+        plt.title(f'ROC-Kurve - Klassisch SVM ({self.kernel} Kernel)')
         plt.legend(loc="lower right")
         plt.grid(alpha=0.3)
         plt.tight_layout()

@@ -212,7 +212,7 @@ class QuantumKernelSVM:
         # Train classical SVM with precomputed kernel
         print(f"\n🔧 Training SVM with precomputed quantum kernel...")
         train_start = time.time()
-        self.model = SVC(kernel='precomputed', random_state=self.random_state)
+        self.model = SVC(kernel='precomputed', random_state=self.random_state, probability=True)
         self.model.fit(self.K_train, y_train)
         self.training_time = time.time() - train_start
 
@@ -250,6 +250,26 @@ class QuantumKernelSVM:
         self.prediction_time = time.time() - pred_start
 
         return predictions
+
+    def predict_proba(self, X_test: np.ndarray, X_train: np.ndarray) -> np.ndarray:
+        """
+        Predict class probabilities.
+
+        Args:
+            X_test: Test features
+            X_train: Training features (needed to compute test-train kernel)
+
+        Returns:
+            Class probabilities
+        """
+        if not self.is_trained:
+            raise ValueError("Model not trained. Call train() first.")
+
+        # Compute test-train kernel matrix
+        cache_key = f"test_train_n{X_test.shape[0]}x{X_train.shape[0]}_q{self.n_qubits}"
+        K_test_train = self.compute_kernel_matrix(X_test, X_train, cache_key=cache_key)
+
+        return self.model.predict_proba(K_test_train)
 
     def evaluate(
         self,
@@ -332,12 +352,12 @@ class QuantumKernelSVM:
             annot=True,
             fmt='d',
             cmap='Blues',
-            xticklabels=['Bad Credit', 'Good Credit'],
-            yticklabels=['Bad Credit', 'Good Credit']
+            xticklabels=['Schlechter Kredit', 'Guter Kredit'],
+            yticklabels=['Schlechter Kredit', 'Guter Kredit']
         )
-        plt.title(f'Confusion Matrix - Quantum SVM ({self.n_qubits} qubits)')
-        plt.ylabel('True Label')
-        plt.xlabel('Predicted Label')
+        plt.title(f'Konfusionsmatrix - Quantum SVM ({self.n_qubits} Qubits)')
+        plt.ylabel('Tatsächliches Label')
+        plt.xlabel('Vorhergesagtes Label')
         plt.tight_layout()
 
         if save_path:
@@ -346,6 +366,45 @@ class QuantumKernelSVM:
             print(f"📈 Saved confusion matrix to: {save_path}")
 
         plt.close()  # Close figure to free memory
+
+    def plot_roc_curve(
+        self,
+        X_test: np.ndarray,
+        y_test: np.ndarray,
+        X_train: np.ndarray,
+        save_path: Optional[str] = "results/roc_curve_quantum.png"
+    ) -> None:
+        """
+        Plot ROC curve.
+
+        Args:
+            X_test: Test features
+            y_test: Test labels
+            X_train: Training features (needed for kernel computation)
+            save_path: Path to save the plot (None = display only)
+        """
+        y_proba = self.predict_proba(X_test, X_train)[:, 1]
+        fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+        auc = roc_auc_score(y_test, y_proba)
+
+        plt.figure(figsize=(8, 6))
+        plt.plot(fpr, tpr, linewidth=2, label=f'Quantum SVM (AUC = {auc:.4f})')
+        plt.plot([0, 1], [0, 1], 'k--', linewidth=1, label='Zufallsklassifikator')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('Falsch-Positiv-Rate')
+        plt.ylabel('Richtig-Positiv-Rate')
+        plt.title(f'ROC-Kurve - Quantum SVM ({self.n_qubits} Qubits)')
+        plt.legend(loc="lower right")
+        plt.grid(alpha=0.3)
+        plt.tight_layout()
+
+        if save_path:
+            Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            print(f"📈 Saved ROC curve to: {save_path}")
+
+        plt.close()
 
     def generate_classification_report(
         self,

@@ -160,6 +160,7 @@ def run_quantum_pipeline(n_components: int = 4, subset_size: int = None) -> dict
     print("-" * 80)
     qsvm.generate_classification_report(X_test, y_test, X_train)
     qsvm.plot_confusion_matrix(X_test, y_test, X_train)
+    qsvm.plot_roc_curve(X_test, y_test, X_train)
 
     # Step 6: Save Model
     qsvm.save_model()
@@ -189,11 +190,11 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
         n_test: Number of test samples used
     """
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
-    fig.suptitle('Classical vs Quantum SVM: Comprehensive Comparison\nBI2 Project - German Credit Risk Dataset',
+    fig.suptitle('Klassisch vs. Quantum SVM: Umfassender Vergleich\nBI2-Projekt - German Credit Risk Datensatz',
                  fontsize=16, fontweight='bold', y=0.98)
 
     # 1. Performance Metrics Comparison (Bar Chart)
-    metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
+    metrics = ['Genauigkeit', 'Präzision', 'Recall', 'F1-Wert']
     classical_values = [classical_metrics['accuracy'], classical_metrics['precision'],
                        classical_metrics['recall'], classical_metrics['f1_score']]
     quantum_values = [quantum_metrics['accuracy'], quantum_metrics['precision'],
@@ -205,8 +206,8 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     bars1 = ax1.bar(x - width/2, classical_values, width, label='Classical SVM', color='#3498db', alpha=0.8)
     bars2 = ax1.bar(x + width/2, quantum_values, width, label='Quantum SVM', color='#e74c3c', alpha=0.8)
 
-    ax1.set_ylabel('Score', fontsize=12, fontweight='bold')
-    ax1.set_title('Performance Metrics Comparison', fontsize=13, fontweight='bold', pad=15)
+    ax1.set_ylabel('Wert', fontsize=12, fontweight='bold')
+    ax1.set_title('Vergleich der Leistungsmetriken', fontsize=13, fontweight='bold', pad=15)
     ax1.set_xticks(x)
     ax1.set_xticklabels(metrics)
     ax1.legend(loc='lower right', fontsize=11)
@@ -226,16 +227,16 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     c_pred = classical_metrics.get('prediction_time', 0)
     q_pred = quantum_metrics.get('prediction_time', 0)
 
-    timing_labels = ['Training Time', 'Prediction Time']
+    timing_labels = ['Trainingszeit', 'Vorhersagezeit']
     classical_times = [c_train, c_pred]
     quantum_times = [q_train, q_pred]
 
     x_timing = np.arange(len(timing_labels))
-    bars3 = ax2.bar(x_timing - width/2, classical_times, width, label='Classical SVM', color='#3498db', alpha=0.8)
+    bars3 = ax2.bar(x_timing - width/2, classical_times, width, label='Klassisch SVM', color='#3498db', alpha=0.8)
     bars4 = ax2.bar(x_timing + width/2, quantum_times, width, label='Quantum SVM', color='#e74c3c', alpha=0.8)
 
-    ax2.set_ylabel('Time (seconds, log scale)', fontsize=12, fontweight='bold')
-    ax2.set_title('Computational Efficiency Comparison', fontsize=13, fontweight='bold', pad=15)
+    ax2.set_ylabel('Zeit (Sekunden, log. Skala)', fontsize=12, fontweight='bold')
+    ax2.set_title('Vergleich der Recheneffizienz', fontsize=13, fontweight='bold', pad=15)
     ax2.set_xticks(x_timing)
     ax2.set_xticklabels(timing_labels)
     ax2.legend(loc='upper right', fontsize=11)
@@ -245,9 +246,9 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     # Add speedup annotations
     train_speedup = q_train / c_train if c_train > 0 else 0
     pred_speedup = q_pred / c_pred if c_pred > 0 else 0
-    ax2.text(0, max(c_train, q_train) * 1.5, f'{train_speedup:.0f}x\nslower',
+    ax2.text(0, max(c_train, q_train) * 1.5, f'{train_speedup:.0f}x\nlangsamer',
             ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
-    ax2.text(1, max(c_pred, q_pred) * 1.5, f'{pred_speedup:.0f}x\nslower',
+    ax2.text(1, max(c_pred, q_pred) * 1.5, f'{pred_speedup:.0f}x\nlangsamer',
             ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
 
     # 3. Metrics Heatmap
@@ -260,10 +261,10 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
 
     im = ax3.imshow(comparison_data, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1)
     ax3.set_xticks([0, 1])
-    ax3.set_xticklabels(['Classical', 'Quantum'], fontsize=11)
+    ax3.set_xticklabels(['Klassisch', 'Quantum'], fontsize=11)
     ax3.set_yticks([0, 1, 2, 3])
-    ax3.set_yticklabels(['Accuracy', 'Precision', 'Recall', 'F1-Score'], fontsize=11)
-    ax3.set_title('Performance Heatmap', fontsize=13, fontweight='bold', pad=15)
+    ax3.set_yticklabels(['Genauigkeit', 'Präzision', 'Recall', 'F1-Wert'], fontsize=11)
+    ax3.set_title('Leistungs-Heatmap', fontsize=13, fontweight='bold', pad=15)
 
     # Add text annotations
     for i in range(len(metrics)):
@@ -272,42 +273,42 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
                           ha="center", va="center", color="black", fontsize=11, fontweight='bold')
 
     cbar = plt.colorbar(im, ax=ax3)
-    cbar.set_label('Score', fontsize=11, fontweight='bold')
+    cbar.set_label('Wert', fontsize=11, fontweight='bold')
 
     # 4. Summary Text Box
     ax4.axis('off')
 
     total_samples = n_train + n_test
     summary_text = f"""
-    EXPERIMENT SUMMARY
+    ZUSAMMENFASSUNG DES EXPERIMENTS
     {'='*50}
 
-    Dataset: German Credit Risk (OpenML)
-    Samples: {total_samples} ({n_train} train / {n_test} test)
-    Features: 48 → {quantum_metrics.get('n_qubits', 4)} (PCA, {quantum_metrics.get('n_qubits', 4)} qubits)
+    Datensatz: German Credit Risk (OpenML)
+    Stichproben: {total_samples} ({n_train} Training / {n_test} Test)
+    Merkmale: 48 → {quantum_metrics.get('n_qubits', 4)} (PCA, {quantum_metrics.get('n_qubits', 4)} Qubits)
 
-    PERFORMANCE WINNER: {'Quantum' if quantum_metrics['f1_score'] > classical_metrics['f1_score'] else 'Classical' if classical_metrics['f1_score'] > quantum_metrics['f1_score'] else 'Tie'}
-    • Accuracy Δ: {abs(classical_metrics['accuracy'] - quantum_metrics['accuracy'])*100:.2f}% (minimal)
-    • F1-Score: Quantum {quantum_metrics['f1_score']:.4f} vs Classical {classical_metrics['f1_score']:.4f}
-    • Quantum has higher recall ({quantum_metrics['recall']:.2%})
-    • Classical has higher precision ({classical_metrics['precision']:.2%})
+    LEISTUNGS-GEWINNER: {'Quantum' if quantum_metrics['f1_score'] > classical_metrics['f1_score'] else 'Klassisch' if classical_metrics['f1_score'] > quantum_metrics['f1_score'] else 'Unentschieden'}
+    • Genauigkeit Δ: {abs(classical_metrics['accuracy'] - quantum_metrics['accuracy'])*100:.2f}% (minimal)
+    • F1-Wert: Quantum {quantum_metrics['f1_score']:.4f} vs Klassisch {classical_metrics['f1_score']:.4f}
+    • Quantum hat höheren Recall ({quantum_metrics['recall']:.2%})
+    • Klassisch hat höhere Präzision ({classical_metrics['precision']:.2%})
 
-    EFFICIENCY WINNER: Classical
-    • Training: {train_speedup:.0f}x faster
-    • Prediction: {pred_speedup:.0f}x faster
-    • Total time: Classical {c_train + c_pred:.2f}s vs Quantum {q_train + q_pred:.0f}s
+    EFFIZIENZ-GEWINNER: Klassisch
+    • Training: {train_speedup:.0f}x schneller
+    • Vorhersage: {pred_speedup:.0f}x schneller
+    • Gesamtzeit: Klassisch {c_train + c_pred:.2f}s vs Quantum {q_train + q_pred:.0f}s
 
-    CONCLUSION FOR BI2 PROJECT:
-    Quantum SVM provides marginal performance gains
-    ({(quantum_metrics['f1_score'] - classical_metrics['f1_score'])*100:.1f}% F1-score improvement) but at
-    exponential computational cost ({train_speedup:.0f}x slower).
+    FAZIT FÜR BI2-PROJEKT:
+    Quantum SVM bietet marginale Leistungsverbesserungen
+    ({(quantum_metrics['f1_score'] - classical_metrics['f1_score'])*100:.1f}% F1-Wert-Verbesserung) bei
+    exponentiellem Rechenaufwand ({train_speedup:.0f}x langsamer).
 
-    Quantum simulation overhead makes it impractical
-    for production use with current technology.
-    Real quantum hardware may change this trajectory.
+    Der Overhead der Quantensimulation macht sie für den
+    produktiven Einsatz mit aktueller Technologie unpraktisch.
+    Echte Quantenhardware könnte dies ändern.
 
-    Generated: {Path(__file__).parent.name}
-    Student: Gregor Kobilarov | Course: BI2 | Semester: 6
+    Erstellt: {Path(__file__).parent.name}
+    Student: Gregor Kobilarov | Kurs: BI2 | Semester: 6
     """
 
     ax4.text(0.05, 0.95, summary_text, transform=ax4.transAxes,
@@ -318,6 +319,124 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     Path(save_path).parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     print(f"\n📊 Saved comparison visualization to: {save_path}")
+    plt.close()
+
+
+def create_combined_roc_curve(
+    classical_model,
+    quantum_model,
+    X_test: np.ndarray,
+    y_test: np.ndarray,
+    X_train: np.ndarray,
+    save_path: str = "results/roc_curve_comparison.png"
+) -> None:
+    """
+    Create a combined ROC curve comparing Classical and Quantum SVM.
+
+    Args:
+        classical_model: Trained Classical SVM model
+        quantum_model: Trained Quantum SVM model
+        X_test: Test features
+        y_test: Test labels
+        X_train: Training features (needed for quantum kernel)
+        save_path: Path to save the visualization
+    """
+    from sklearn.metrics import roc_curve, roc_auc_score
+
+    # Get probabilities from both models
+    classical_proba = classical_model.predict_proba(X_test)[:, 1]
+    quantum_proba = quantum_model.predict_proba(X_test, X_train)[:, 1]
+
+    # Calculate ROC curves
+    c_fpr, c_tpr, _ = roc_curve(y_test, classical_proba)
+    q_fpr, q_tpr, _ = roc_curve(y_test, quantum_proba)
+
+    # Calculate AUC scores
+    c_auc = roc_auc_score(y_test, classical_proba)
+    q_auc = roc_auc_score(y_test, quantum_proba)
+
+    # Create plot
+    plt.figure(figsize=(10, 8))
+    plt.plot(c_fpr, c_tpr, linewidth=2.5, color='#3498db',
+             label=f'Klassisch SVM (AUC = {c_auc:.4f})')
+    plt.plot(q_fpr, q_tpr, linewidth=2.5, color='#e74c3c',
+             label=f'Quantum SVM (AUC = {q_auc:.4f})')
+    plt.plot([0, 1], [0, 1], 'k--', linewidth=1.5, label='Zufallsklassifikator (AUC = 0.5)')
+
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Falsch-Positiv-Rate', fontsize=12, fontweight='bold')
+    plt.ylabel('Richtig-Positiv-Rate', fontsize=12, fontweight='bold')
+    plt.title('ROC-Kurven-Vergleich: Klassisch vs. Quantum SVM\nGerman Credit Risk Datensatz',
+              fontsize=14, fontweight='bold')
+    plt.legend(loc="lower right", fontsize=11)
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+
+    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"📈 Saved combined ROC curve to: {save_path}")
+    plt.close()
+
+
+def create_combined_precision_recall_curve(
+    classical_model,
+    quantum_model,
+    X_test: np.ndarray,
+    y_test: np.ndarray,
+    X_train: np.ndarray,
+    save_path: str = "results/precision_recall_comparison.png"
+) -> None:
+    """
+    Create a combined Precision-Recall curve comparing Classical and Quantum SVM.
+
+    Args:
+        classical_model: Trained Classical SVM model
+        quantum_model: Trained Quantum SVM model
+        X_test: Test features
+        y_test: Test labels
+        X_train: Training features (needed for quantum kernel)
+        save_path: Path to save the visualization
+    """
+    from sklearn.metrics import precision_recall_curve, average_precision_score
+
+    # Get probabilities from both models
+    classical_proba = classical_model.predict_proba(X_test)[:, 1]
+    quantum_proba = quantum_model.predict_proba(X_test, X_train)[:, 1]
+
+    # Calculate Precision-Recall curves
+    c_precision, c_recall, _ = precision_recall_curve(y_test, classical_proba)
+    q_precision, q_recall, _ = precision_recall_curve(y_test, quantum_proba)
+
+    # Calculate Average Precision scores
+    c_ap = average_precision_score(y_test, classical_proba)
+    q_ap = average_precision_score(y_test, quantum_proba)
+
+    # Baseline: proportion of positive class
+    baseline = y_test.sum() / len(y_test)
+
+    # Create plot
+    plt.figure(figsize=(10, 8))
+    plt.plot(c_recall, c_precision, linewidth=2.5, color='#3498db',
+             label=f'Klassisch SVM (AP = {c_ap:.4f})')
+    plt.plot(q_recall, q_precision, linewidth=2.5, color='#e74c3c',
+             label=f'Quantum SVM (AP = {q_ap:.4f})')
+    plt.axhline(y=baseline, color='k', linestyle='--', linewidth=1.5,
+                label=f'Zufallsklassifikator (AP = {baseline:.4f})')
+
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Recall (Wie viele Gute erkannt?)', fontsize=12, fontweight='bold')
+    plt.ylabel('Präzision (Wie viele Bewilligte sind gut?)', fontsize=12, fontweight='bold')
+    plt.title('Precision-Recall-Kurve: Klassisch vs. Quantum SVM\nGerman Credit Risk Datensatz',
+              fontsize=14, fontweight='bold')
+    plt.legend(loc="lower left", fontsize=11)
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+
+    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"📈 Saved combined Precision-Recall curve to: {save_path}")
     plt.close()
 
 
@@ -424,6 +543,24 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     n_train = len(quantum_results['X_train'])
     n_test = len(quantum_results['X_test'])
     create_comparison_visualization(c_metrics, q_metrics, n_train=n_train, n_test=n_test)
+
+    # Generate combined ROC curve
+    create_combined_roc_curve(
+        classical_model=classical_results['model'],
+        quantum_model=quantum_results['model'],
+        X_test=quantum_results['X_test'],
+        y_test=quantum_results['y_test'],
+        X_train=quantum_results['X_train']
+    )
+
+    # Generate combined Precision-Recall curve
+    create_combined_precision_recall_curve(
+        classical_model=classical_results['model'],
+        quantum_model=quantum_results['model'],
+        X_test=quantum_results['X_test'],
+        y_test=quantum_results['y_test'],
+        X_train=quantum_results['X_train']
+    )
 
 
 def main():
