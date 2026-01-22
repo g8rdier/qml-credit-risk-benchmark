@@ -29,6 +29,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.metrics import roc_curve, roc_auc_score, precision_recall_curve, average_precision_score
 
 
 def run_classical_pipeline(n_components: int = 4, compare_kernel: bool = False, subset_size: int = None) -> dict:
@@ -160,6 +161,7 @@ def run_quantum_pipeline(n_components: int = 4, subset_size: int = None) -> dict
     print("-" * 80)
     qsvm.generate_classification_report(X_test, y_test, X_train)
     qsvm.plot_confusion_matrix(X_test, y_test, X_train)
+    qsvm.plot_roc_curve(X_test, y_test, X_train)
 
     # Step 6: Save Model
     qsvm.save_model()
@@ -321,6 +323,120 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     plt.close()
 
 
+def create_combined_roc_curve(
+    classical_model,
+    quantum_model,
+    X_test: np.ndarray,
+    y_test: np.ndarray,
+    X_train: np.ndarray,
+    save_path: str = "results/roc_curve_comparison.png"
+) -> None:
+    """
+    Create a combined ROC curve comparing Classical and Quantum SVM.
+
+    Args:
+        classical_model: Trained classical SVM model
+        quantum_model: Trained quantum SVM model
+        X_test: Test features
+        y_test: Test labels
+        X_train: Training features (needed for quantum kernel)
+        save_path: Path to save the plot
+    """
+    # Get probabilities from both models
+    classical_proba = classical_model.predict_proba(X_test)[:, 1]
+    quantum_proba = quantum_model.predict_proba(X_test, X_train)[:, 1]
+
+    # Calculate ROC curves
+    classical_fpr, classical_tpr, _ = roc_curve(y_test, classical_proba)
+    quantum_fpr, quantum_tpr, _ = roc_curve(y_test, quantum_proba)
+
+    # Calculate AUC scores
+    classical_auc = roc_auc_score(y_test, classical_proba)
+    quantum_auc = roc_auc_score(y_test, quantum_proba)
+
+    # Create plot
+    plt.figure(figsize=(10, 8))
+    plt.plot(classical_fpr, classical_tpr, linewidth=2.5,
+             label=f'Classical SVM (AUC = {classical_auc:.4f})', color='#3498db')
+    plt.plot(quantum_fpr, quantum_tpr, linewidth=2.5,
+             label=f'Quantum SVM (AUC = {quantum_auc:.4f})', color='#e74c3c')
+    plt.plot([0, 1], [0, 1], 'k--', linewidth=1.5, label='Random Classifier')
+
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate', fontsize=12, fontweight='bold')
+    plt.ylabel('True Positive Rate', fontsize=12, fontweight='bold')
+    plt.title('ROC Curve Comparison: Classical vs Quantum SVM\nGerman Credit Risk Dataset',
+              fontsize=14, fontweight='bold')
+    plt.legend(loc="lower right", fontsize=11)
+    plt.grid(alpha=0.3, linestyle='--')
+    plt.tight_layout()
+
+    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"📈 Saved combined ROC curve to: {save_path}")
+    plt.close()
+
+
+def create_combined_precision_recall_curve(
+    classical_model,
+    quantum_model,
+    X_test: np.ndarray,
+    y_test: np.ndarray,
+    X_train: np.ndarray,
+    save_path: str = "results/precision_recall_comparison.png"
+) -> None:
+    """
+    Create a combined Precision-Recall curve comparing Classical and Quantum SVM.
+
+    Args:
+        classical_model: Trained classical SVM model
+        quantum_model: Trained quantum SVM model
+        X_test: Test features
+        y_test: Test labels
+        X_train: Training features (needed for quantum kernel)
+        save_path: Path to save the plot
+    """
+    # Get probabilities from both models
+    classical_proba = classical_model.predict_proba(X_test)[:, 1]
+    quantum_proba = quantum_model.predict_proba(X_test, X_train)[:, 1]
+
+    # Calculate Precision-Recall curves
+    classical_precision, classical_recall, _ = precision_recall_curve(y_test, classical_proba)
+    quantum_precision, quantum_recall, _ = precision_recall_curve(y_test, quantum_proba)
+
+    # Calculate Average Precision scores
+    classical_ap = average_precision_score(y_test, classical_proba)
+    quantum_ap = average_precision_score(y_test, quantum_proba)
+
+    # Create plot
+    plt.figure(figsize=(10, 8))
+    plt.plot(classical_recall, classical_precision, linewidth=2.5,
+             label=f'Classical SVM (AP = {classical_ap:.4f})', color='#3498db')
+    plt.plot(quantum_recall, quantum_precision, linewidth=2.5,
+             label=f'Quantum SVM (AP = {quantum_ap:.4f})', color='#e74c3c')
+
+    # Add baseline (proportion of positive class)
+    baseline = y_test.sum() / len(y_test)
+    plt.axhline(y=baseline, color='gray', linestyle='--', linewidth=1.5,
+                label=f'Baseline (No Skill) = {baseline:.2f}')
+
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Recall', fontsize=12, fontweight='bold')
+    plt.ylabel('Precision', fontsize=12, fontweight='bold')
+    plt.title('Precision-Recall Curve Comparison: Classical vs Quantum SVM\nGerman Credit Risk Dataset',
+              fontsize=14, fontweight='bold')
+    plt.legend(loc="lower left", fontsize=11)
+    plt.grid(alpha=0.3, linestyle='--')
+    plt.tight_layout()
+
+    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"📈 Saved combined Precision-Recall curve to: {save_path}")
+    plt.close()
+
+
 def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     """
     Run both classical and quantum pipelines and compare results.
@@ -420,10 +536,28 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     print("   Real quantum hardware may change this, but simulators don't provide advantages.")
     print("="*80)
 
-    # Generate comparison visualization
+    # Generate comparison visualizations
     n_train = len(quantum_results['X_train'])
     n_test = len(quantum_results['X_test'])
     create_comparison_visualization(c_metrics, q_metrics, n_train=n_train, n_test=n_test)
+
+    # Generate combined ROC curve
+    create_combined_roc_curve(
+        classical_results['model'],
+        quantum_results['model'],
+        quantum_results['X_test'],
+        quantum_results['y_test'],
+        quantum_results['X_train']
+    )
+
+    # Generate combined Precision-Recall curve
+    create_combined_precision_recall_curve(
+        classical_results['model'],
+        quantum_results['model'],
+        quantum_results['X_test'],
+        quantum_results['y_test'],
+        quantum_results['X_train']
+    )
 
 
 def main():
