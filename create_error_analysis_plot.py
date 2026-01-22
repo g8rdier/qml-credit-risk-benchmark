@@ -13,8 +13,8 @@ from pathlib import Path
 def create_error_analysis_plot():
     """Create comprehensive error analysis visualization."""
 
-    # Data from confusion matrices
-    classical_cm = {'TN': 23, 'FP': 37, 'FN': 19, 'TP': 121}
+    # Data from confusion matrices (fresh run Jan 2026)
+    classical_cm = {'TN': 20, 'FP': 40, 'FN': 20, 'TP': 120}
     quantum_cm = {'TN': 3, 'FP': 57, 'FN': 2, 'TP': 138}
 
     fig = plt.figure(figsize=(16, 10))
@@ -52,9 +52,9 @@ def create_error_analysis_plot():
 
     # Add annotations
     ax1.text(0, max(classical_errors[0], quantum_errors[0]) * 1.2,
-             f'89% reduction', ha='center', fontsize=10, color='green', fontweight='bold')
+             f'90% reduction', ha='center', fontsize=10, color='green', fontweight='bold')
     ax1.text(1, max(classical_errors[1], quantum_errors[1]) * 1.1,
-             f'54% increase', ha='center', fontsize=10, color='orange', fontweight='bold')
+             f'43% increase', ha='center', fontsize=10, color='orange', fontweight='bold')
 
     # 2. Business Cost Impact
     ax2 = fig.add_subplot(gs[0, 1])
@@ -96,7 +96,7 @@ def create_error_analysis_plot():
 
     savings_pct = (classical_total - quantum_total) / classical_total * 100
     ax2.text(0.5, max(classical_total, quantum_total) * 1.15,
-             f'74% cost reduction', ha='center', fontsize=11,
+             f'75% cost reduction', ha='center', fontsize=11,
              color='green', fontweight='bold',
              bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.5))
 
@@ -142,28 +142,28 @@ def create_error_analysis_plot():
     ═══════════════════════════════════════════════════════════════════════════
 
     Classical SVM:                              Quantum SVM:
-    ├─ True Negatives (TN):     23              ├─ True Negatives (TN):      3
-    ├─ False Positives (FP):    37              ├─ False Positives (FP):    57
-    ├─ False Negatives (FN):    19  ← HIGH RISK ├─ False Negatives (FN):     2  ← LOW RISK ✓
-    └─ True Positives (TP):    121              └─ True Positives (TP):    138
+    ├─ True Negatives (TN):     20              ├─ True Negatives (TN):      3
+    ├─ False Positives (FP):    40              ├─ False Positives (FP):    57
+    ├─ False Negatives (FN):    20  ← HIGH RISK ├─ False Negatives (FN):     2  ← LOW RISK ✓
+    └─ True Positives (TP):    120              └─ True Positives (TP):    138
 
     KEY FINDINGS:
     ─────────────────────────────────────────────────────────────────────────
 
     1. FALSE NEGATIVE REDUCTION (Critical for Credit Risk)
-       • Classical: 19 bad credits approved (13.6% Type II error)
+       • Classical: 20 bad credits approved (14.3% Type II error)
        • Quantum: 2 bad credits approved (1.4% Type II error)
-       → 89.5% reduction in default risk
+       → 90% reduction in default risk
 
     2. TRADE-OFF: Increased False Positives
-       • Classical: 37 good credits rejected
-       • Quantum: 57 good credits rejected (54% increase)
+       • Classical: 40 good credits rejected
+       • Quantum: 57 good credits rejected (43% increase)
        → More conservative lending approach
 
     3. BUSINESS IMPACT* (per 200 loan applications)
-       • Classical total cost: €170,500 (€152k defaults + €18.5k lost opportunities)
+       • Classical total cost: €180,000 (€160k defaults + €20k lost opportunities)
        • Quantum total cost: €44,500 (€16k defaults + €28.5k lost opportunities)
-       → €126,000 savings (73.9% cost reduction)
+       → €135,500 savings (75.3% cost reduction)
        *Hypothetical scenario using industry-typical assumptions (€10k avg loan,
         80% default loss rate, 5% opportunity cost)
 

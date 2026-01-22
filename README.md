@@ -375,12 +375,12 @@ If you're new to machine learning or quantum computing, here are the key terms e
 ### This Project's Approach
 
 **Classical SVM:** Uses traditional RBF kernel on 4 PCA-reduced features
-- Fast (0.05 seconds training)
+- Fast (0.04 seconds training)
 - Well-understood and proven
 - Good baseline performance
 
 **Quantum SVM:** Uses quantum kernel with 4-qubit quantum circuits
-- Slow in simulation (774 seconds training)
+- Slow in simulation (396 seconds training)
 - Explores quantum feature space
 - Marginal performance improvement in this experiment
 
@@ -415,9 +415,9 @@ The project tracks the following metrics for comparison:
 
 | Operation | Classical SVM | Quantum SVM | Speedup |
 |-----------|---------------|-------------|---------|
-| **Training** | 0.05s | 774.72s | Classical 15,494x faster |
-| **Prediction** | 0.003s | 409.40s | Classical 136,467x faster |
-| **Total Time** | 0.08s | 1,184.13s | Classical 14,801x faster |
+| **Training** | 0.04s | 396.26s | Classical 9,894x faster |
+| **Prediction** | 0.003s | 266.13s | Classical 90,551x faster |
+| **Total Time** | 0.04s | 662.38s | Classical 15,415x faster |
 
 **Methodology Note:** Quantum timing results reflect first-run performance without kernel caching. The quantum implementation includes a caching mechanism for kernel matrices (stored in `data/processed/`), which can speed up repeated experiments with identical parameters. However, all reported benchmarks use fresh kernel computation to ensure fair comparison with classical methods and represent realistic first-run performance.
 
@@ -426,14 +426,14 @@ The project tracks the following metrics for comparison:
 **Hypothesis Testing Results:**
 
 - **H0₁ (Performance)**: REJECTED - Quantum achieves marginally better F1-score (0.8239 vs 0.8000, +2.4% improvement), though difference is small and may not be statistically significant without repeated trials
-- **H0₂ (Computational Efficiency)**: REJECTED - Quantum is 14,801x slower (1,184s vs 0.08s), strongly supporting H1₂
+- **H0₂ (Computational Efficiency)**: REJECTED - Quantum is 15,415x slower (662s vs 0.04s), strongly supporting H1₂
 - **Overall**: Expected outcome validated - similar accuracy (~0.5% difference) but exponentially higher computational cost
 
 **Detailed Results:**
 
 - **Performance**: Quantum achieves marginally better F1-score (2.4% improvement)
 - **Accuracy**: Near-identical performance validates hypothesis (~0.5% difference)
-- **Computational Cost**: Quantum is 14,801x slower due to simulation overhead
+- **Computational Cost**: Quantum is 15,415x slower due to simulation overhead
 - **Practical Conclusion**: Quantum simulation provides no practical advantage for production use
 
 **Trade-offs:**
@@ -490,9 +490,9 @@ The Precision-Recall curve reveals different operating characteristics:
 ![Error Analysis](results/error_analysis_comprehensive.png)
 
 **Error Pattern Analysis** reveals critical business insights:
-- **89.5% reduction in false negatives** (19 → 2 bad credits approved)
-- **Hypothetical business impact**: Using industry-typical assumptions (€10k avg loan, 80% default loss rate, 5% opportunity cost), this error reduction translates to ~€126k cost savings per 200 applications
-- **Trade-off**: 54% increase in false positives (more conservative lending)
+- **90% reduction in false negatives** (20 → 2 bad credits approved)
+- **Hypothetical business impact**: Using industry-typical assumptions (€10k avg loan, 80% default loss rate, 5% opportunity cost), this error reduction translates to ~€135k cost savings per 200 applications
+- **Trade-off**: 43% increase in false positives (more conservative lending)
 - **Risk profile comparison**: Quantum optimizes for recall (minimizing missed good credits), Classical balances precision/recall
 
 This visualization demonstrates that quantum SVM isn't just marginally better - it has a fundamentally different error profile suitable for risk-averse institutions.
