@@ -467,6 +467,24 @@ The comprehensive comparison includes:
 - Performance heatmap
 - Summary analysis for BI2 project
 
+#### ROC Curve Comparison
+
+![ROC Curve Comparison](results/roc_curve_comparison.png)
+
+The ROC (Receiver Operating Characteristic) curve comparison shows:
+- **Classical SVM**: Better AUC (Area Under Curve) indicating superior discrimination ability
+- **Quantum SVM**: Lower AUC due to extreme recall-precision trade-off
+- Both curves significantly outperform the random classifier baseline
+
+#### Precision-Recall Curve Comparison
+
+![Precision-Recall Curve](results/precision_recall_comparison.png)
+
+The Precision-Recall curve reveals different operating characteristics:
+- **Classical SVM**: More balanced precision-recall trade-off
+- **Quantum SVM**: Higher recall at the cost of precision
+- Baseline shows the no-skill classifier (class proportion)
+
 #### Deep Error Analysis
 
 ![Error Analysis](results/error_analysis_comprehensive.png)
