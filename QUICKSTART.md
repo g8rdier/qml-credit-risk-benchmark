@@ -1,91 +1,91 @@
-# Quick Start Guide
+# Schnellstart-Anleitung
 
-Get up and running with the QML Credit Risk Benchmark in 5 minutes using **pixi** (modern, fast package manager).
+Starten Sie den QML Kreditrisiko-Benchmark in 5 Minuten mit **pixi** (moderner, schneller Paketmanager).
 
-## Step 1: Install pixi (One-Time Setup)
+## Schritt 1: pixi installieren (Einmalige Einrichtung)
 
 ```bash
-# Install pixi (fast, Rust-based package manager)
+# pixi installieren (schneller, Rust-basierter Paketmanager)
 curl -fsSL https://pixi.sh/install.sh | bash
 
-# Restart your shell or run:
+# Shell neu starten oder ausführen:
 export PATH="$HOME/.pixi/bin:$PATH"
 ```
 
-## Step 2: Install Project Dependencies
+## Schritt 2: Projektabhängigkeiten installieren
 
 ```bash
-# Install all dependencies (creates isolated environment automatically)
+# Alle Abhängigkeiten installieren (erstellt automatisch isolierte Umgebung)
 pixi install
 
-# This installs: pandas, numpy, scikit-learn, qiskit, matplotlib, seaborn, etc.
-# Much faster than pip (uses pre-compiled binaries from conda-forge)
+# Dies installiert: pandas, numpy, scikit-learn, qiskit, matplotlib, seaborn, etc.
+# Viel schneller als pip (verwendet vorkompilierte Binaries von conda-forge)
 ```
 
-## Step 3: Verify Installation
+## Schritt 3: Installation überprüfen
 
 ```bash
 pixi run python verify_pixi.py
 ```
 
-This will verify that:
-- All required packages are installed
-- Project structure is correct
-- Modules can be imported
-- A quick end-to-end test runs successfully
+Dies überprüft:
+- Alle erforderlichen Pakete sind installiert
+- Projektstruktur ist korrekt
+- Module können importiert werden
+- Ein schneller End-to-End-Test läuft erfolgreich
 
-## Step 4: Run Classical SVM Pipeline
+## Schritt 4: Klassische SVM-Pipeline ausführen
 
-### Option A: Simple Run (Default Settings)
+### Option A: Einfacher Lauf (Standardeinstellungen)
 
 ```bash
 pixi run run-classical
 ```
 
-This will:
-1. Load German Credit Data from OpenML
-2. Preprocess with 4 PCA components
-3. Train an RBF kernel SVM
-4. Evaluate and generate visualizations
-5. Save models to `models/`
-6. Save plots to `results/`
+Dies wird:
+1. German Credit Daten von OpenML laden
+2. Mit 4 PCA-Komponenten vorverarbeiten
+3. Eine RBF-Kernel SVM trainieren
+4. Evaluieren und Visualisierungen generieren
+5. Modelle in `models/` speichern
+6. Plots in `results/` speichern
 
-### Option B: Compare Kernels
+### Option B: Kernel vergleichen
 
 ```bash
 pixi run compare-kernels
 ```
 
-This compares Linear, RBF, and Polynomial kernels.
+Dies vergleicht Linear-, RBF- und Polynomial-Kernel.
 
-### Option C: Different PCA Components
+### Option C: Verschiedene PCA-Komponenten
 
 ```bash
-# For 4-qubit quantum implementation
+# Für 4-Qubit Quantum-Implementierung
 pixi run run-classical-4
 
-# For 8-qubit quantum implementation
+# Für 8-Qubit Quantum-Implementierung
 pixi run run-classical-8
 ```
 
-## Step 5: Explore with Jupyter Notebook
+## Schritt 5: Mit Jupyter Notebook erkunden
 
 ```bash
 pixi run notebook
-# Or start Jupyter server: pixi run notebook-server
+# Oder Jupyter-Server starten: pixi run notebook-server
 ```
 
-This notebook provides:
-- Interactive data exploration
-- Step-by-step preprocessing visualization
-- Hyperparameter tuning experiments
-- Detailed performance analysis
+Dieses Notebook bietet:
+- Interaktive Datenexploration
+- Schritt-für-Schritt Vorverarbeitungs-Visualisierung
+- Hyperparameter-Tuning-Experimente
+- Detaillierte Leistungsanalyse
 
-## Expected Output
+## Erwartete Ausgabe
 
-After running `main.py`, you should see:
+Nach dem Ausführen von `main.py` sollten Sie sehen:
 
-### Console Output:
+### Konsolenausgabe:
 ```
 ================================================================================
 CLASSICAL SVM PIPELINE
@@ -104,103 +104,103 @@ CLASSICAL SVM PIPELINE
 ✅ Classical SVM pipeline completed successfully!
 ```
 
-### Generated Files:
+### Generierte Dateien:
 ```
 models/
-  ├── preprocessor.pkl            # Fitted preprocessor
-  └── classical_svm.pkl           # Trained SVM model
+  ├── preprocessor.pkl            # Angepasster Präprozessor
+  └── classical_svm.pkl           # Trainiertes SVM-Modell
 
 results/
   ├── confusion_matrix_classical.png
   └── roc_curve_classical.png
 ```
 
-## Understanding the Results
+## Ergebnisse verstehen
 
-### Key Metrics to Look For:
+### Wichtige Metriken:
 
-**Accuracy**: Overall correctness (target: ~70-75%)
-**Precision**: How many predicted good credits are actually good
-**Recall**: How many actual good credits we catch
-**F1-Score**: Balanced metric combining precision and recall
-**ROC AUC**: Model's ability to discriminate between classes
+**Genauigkeit (Accuracy)**: Gesamtkorrektheit (Ziel: ~70-75%)
+**Präzision**: Wie viele vorhergesagte gute Kredite sind tatsächlich gut
+**Recall**: Wie viele tatsächlich gute Kredite erkennen wir
+**F1-Wert**: Ausgewogene Metrik, die Präzision und Recall kombiniert
+**ROC AUC**: Fähigkeit des Modells, zwischen Klassen zu unterscheiden
 
-### Typical Performance:
-- **Accuracy**: 0.70-0.75
-- **Training Time**: < 1 second
-- **Support Vectors**: ~400-600 (out of 800 training samples)
+### Typische Leistung:
+- **Genauigkeit**: 0,70-0,75
+- **Trainingszeit**: < 1 Sekunde
+- **Support-Vektoren**: ~400-600 (von 800 Trainingsproben)
 
-## Next Steps
+## Nächste Schritte
 
-1. **Analyze Results**: Check the generated plots in `results/`
-2. **Experiment**: Try different `--n-components` values
-3. **Tune Hyperparameters**: Use the Jupyter notebook for detailed experiments
-4. **Prepare for Quantum**: Once satisfied with classical baseline, proceed to quantum implementation
+1. **Ergebnisse analysieren**: Generierte Plots in `results/` prüfen
+2. **Experimentieren**: Verschiedene `--n-components` Werte ausprobieren
+3. **Hyperparameter tunen**: Jupyter Notebook für detaillierte Experimente nutzen
+4. **Für Quantum vorbereiten**: Nach zufriedenstellender klassischer Baseline zur Quantum-Implementierung übergehen
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Issue: "No module named 'sklearn'"
-**Solution**: Run `pixi install`
+### Problem: "No module named 'sklearn'"
+**Lösung**: `pixi install` ausführen
 
-### Issue: "HTTPError: 500 Server Error" (OpenML)
-**Solution**: OpenML might be temporarily down. The data will be cached after first successful download.
+### Problem: "HTTPError: 500 Server Error" (OpenML)
+**Lösung**: OpenML könnte temporär nicht erreichbar sein. Die Daten werden nach dem ersten erfolgreichen Download gecacht.
 
-### Issue: Poor performance (accuracy < 0.60)
-**Solution**:
-- Check if data loaded correctly
-- Try `--compare-kernels` to find best kernel
-- Increase `--n-components` (more features)
+### Problem: Schlechte Leistung (Genauigkeit < 0,60)
+**Lösung**:
+- Prüfen ob Daten korrekt geladen wurden
+- `--compare-kernels` ausprobieren um besten Kernel zu finden
+- `--n-components` erhöhen (mehr Features)
 
-### Issue: Very long training time
-**Solution**:
-- Reduce `--n-components`
-- Use `kernel='linear'` for faster training
-- Check your dataset size (should be 1000 samples)
+### Problem: Sehr lange Trainingszeit
+**Lösung**:
+- `--n-components` reduzieren
+- `kernel='linear'` für schnelleres Training verwenden
+- Datensatzgröße prüfen (sollte 1000 Stichproben sein)
 
-## Advanced Usage
+## Erweiterte Nutzung
 
-### Using Individual Modules
+### Einzelne Module verwenden
 
 ```python
 from src.data_loader import load_credit_data
 from src.preprocessing import CreditDataPreprocessor
 from src.classical_svm import ClassicalSVM
 
-# Load data
+# Daten laden
 X, y = load_credit_data("openml")
 
-# Preprocess
+# Vorverarbeiten
 preprocessor = CreditDataPreprocessor(n_components=4)
 X_train, X_test, y_train, y_test = preprocessor.preprocess_data(X, y)
 
-# Train
+# Trainieren
 svm = ClassicalSVM(kernel='rbf', C=1.0)
 svm.train(X_train, y_train)
 
-# Evaluate
+# Evaluieren
 metrics = svm.evaluate(X_test, y_test)
 svm.plot_confusion_matrix(X_test, y_test)
 ```
 
-## Getting Help
+## Hilfe erhalten
 
-- Check `README.md` for detailed documentation
-- Run `python main.py --help` for command-line options
-- Open an issue on GitHub (if applicable)
-- Review code comments in `src/` modules
+- `README.md` für ausführliche Dokumentation prüfen
+- `python main.py --help` für Kommandozeilenoptionen ausführen
+- Issue auf GitHub öffnen (falls zutreffend)
+- Code-Kommentare in `src/` Modulen durchsehen
 
 ---
 
-**Ready to start?**
+**Bereit zu starten?**
 ```bash
 pixi run python verify_pixi.py && pixi run run-classical
 ```
 
-## Why pixi?
+## Warum pixi?
 
-- ⚡ **10-100x faster** than pip (pre-compiled binaries)
-- 🔒 **Reproducible** (automatic `pixi.lock` file)
-- 🎯 **Task runner** built-in (no Makefile needed)
-- 📦 **Better for science** (conda-forge has optimized packages)
+- ⚡ **10-100x schneller** als pip (vorkompilierte Binaries)
+- 🔒 **Reproduzierbar** (automatische `pixi.lock` Datei)
+- 🎯 **Task-Runner** integriert (kein Makefile nötig)
+- 📦 **Besser für Wissenschaft** (conda-forge hat optimierte Pakete)
 
-See `PIXI_GUIDE.md` for complete documentation.
+Siehe `PIXI_GUIDE.md` für vollständige Dokumentation.
