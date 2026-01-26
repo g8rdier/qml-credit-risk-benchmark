@@ -299,16 +299,17 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     EFFIZIENZ-GEWINNER: Klassisch
     • Training: Quantum {train_speedup:.1f}x langsamer
     • Vorhersage: Quantum {pred_speedup:.1f}x langsamer
-    • Gesamtzeit: Klassisch {c_train + c_pred:.2f}s vs Quantum {q_train + q_pred:.2f}s
+    • Gesamtzeit: Klassisch {c_train + c_pred:.4f}s vs Quantum {q_train + q_pred:.2f}s
 
     FAZIT FÜR BI2-PROJEKT:
     Quantum SVM bietet marginale Leistungsverbesserungen
     ({(quantum_metrics['f1_score'] - classical_metrics['f1_score'])*100:.1f}% F1-Wert-Verbesserung) bei
     exponentiellem Rechenaufwand ({train_speedup:.0f}x langsamer).
 
-    Der Overhead der Quantensimulation macht sie für den
-    produktiven Einsatz mit aktueller Technologie unpraktisch.
-    Echte Quantenhardware könnte dies ändern.
+    Für diese Problemgröße (4 Qubits/800 Samples) sind Quantum-
+    methoden fundamental ungeeignet - weder Simulatoren noch echte
+    Hardware bieten Vorteile. Quantum-Vorteile erfordern deutlich
+    größere, speziell strukturierte Probleme (~50+ Qubits).
 
     Erstellt: {Path(__file__).parent.name}
     Student: Gregor Kobilarov | Kurs: BI2 | Semester: 6
@@ -543,8 +544,9 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     print(f"   • Classical shows {'higher' if c_metrics['precision'] > q_metrics['precision'] else 'lower'} precision: {c_metrics['precision']:.2%} vs {q_metrics['precision']:.2%}")
 
     print("\n🔬 Conclusion for BI2 Project:")
-    print("   Quantum SVM simulation overhead makes it impractical for current use cases.")
-    print("   Real quantum hardware may change this, but simulators don't provide advantages.")
+    print("   For this problem size (4 qubits/800 samples), quantum methods are fundamentally")
+    print("   unsuitable - neither simulators nor real hardware offer advantages. Quantum benefits")
+    print("   require significantly larger, specially structured problems (~50+ qubits).")
     print("="*80)
 
     # Generate comparison visualization
