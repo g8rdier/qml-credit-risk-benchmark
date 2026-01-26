@@ -302,14 +302,14 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     • Gesamtzeit: Klassisch {c_train + c_pred:.4f}s vs Quantum {q_train + q_pred:.2f}s
 
     FAZIT FÜR BI2-PROJEKT:
-    Quantum SVM bietet marginale Leistungsverbesserungen
-    ({(quantum_metrics['f1_score'] - classical_metrics['f1_score'])*100:.1f}% F1-Wert-Verbesserung) bei
-    exponentiellem Rechenaufwand ({train_speedup:.0f}x langsamer).
+    Quantum SVM zeigt messbare Performance-Vorteile: {(quantum_metrics['f1_score'] - classical_metrics['f1_score'])*100:.2f}%
+    F1-Verbesserung und {(quantum_metrics['recall'] - classical_metrics['recall'])*100:.2f}% höherer Recall
+    (bessere Erkennung guter Kreditnehmer).
 
-    Für diese Problemgröße (4 Qubits/800 Samples) sind Quantum-
-    methoden fundamental ungeeignet - weder Simulatoren noch echte
-    Hardware bieten Vorteile. Quantum-Vorteile erfordern deutlich
-    größere, speziell strukturierte Probleme (~50+ Qubits).
+    Jedoch bei ~{train_speedup:.0f}x längerer Rechenzeit. Für dieses
+    Kreditrisiko-Problem ist der marginale Genauigkeitsvorteil
+    die exponentiell höheren Rechenkosten nicht wert. Bei größeren,
+    komplexeren Problemen könnte das Verhältnis günstiger ausfallen.
 
     Erstellt: {Path(__file__).parent.name}
     Student: Gregor Kobilarov | Kurs: BI2 | Semester: 6
@@ -544,9 +544,11 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     print(f"   • Classical shows {'higher' if c_metrics['precision'] > q_metrics['precision'] else 'lower'} precision: {c_metrics['precision']:.2%} vs {q_metrics['precision']:.2%}")
 
     print("\n🔬 Conclusion for BI2 Project:")
-    print("   For this problem size (4 qubits/800 samples), quantum methods are fundamentally")
-    print("   unsuitable - neither simulators nor real hardware offer advantages. Quantum benefits")
-    print("   require significantly larger, specially structured problems (~50+ qubits).")
+    print(f"   Quantum SVM shows measurable performance advantages ({(q_metrics['f1_score'] - c_metrics['f1_score'])*100:.2f}% F1 improvement,")
+    print(f"   {(q_metrics['recall'] - c_metrics['recall'])*100:.2f}% higher recall), but at ~{train_slowdown:.0f}x longer computation time.")
+    print("   For this credit risk problem, the marginal accuracy gain does not justify the")
+    print("   exponentially higher computational cost. At larger, more complex problems, the")
+    print("   trade-off might be more favorable.")
     print("="*80)
 
     # Generate comparison visualization
@@ -571,6 +573,23 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
         y_test=quantum_results['y_test'],
         X_train=quantum_results['X_train']
     )
+
+    # Save metrics to JSON for future visualization regeneration
+    import json
+    metrics_data = {
+        'classical': c_metrics,
+        'quantum': q_metrics,
+        'dataset': {
+            'n_train': n_train,
+            'n_test': n_test,
+            'n_components': quantum_results['model'].n_qubits
+        }
+    }
+    metrics_path = Path("results/comparison_metrics.json")
+    metrics_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(metrics_path, 'w') as f:
+        json.dump(metrics_data, f, indent=2)
+    print(f"\n💾 Saved metrics to: {metrics_path}")
 
 
 def main():
