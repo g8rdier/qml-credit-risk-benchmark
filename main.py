@@ -243,13 +243,16 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     ax2.set_yscale('log')
     ax2.grid(axis='y', alpha=0.3, linestyle='--', which='both')
 
-    # Add speedup annotations
-    train_speedup = q_train / c_train if c_train > 0 else 0
-    pred_speedup = q_pred / c_pred if c_pred > 0 else 0
-    ax2.text(0, max(c_train, q_train) * 1.5, f'{train_speedup:.0f}x\nlangsamer',
-            ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
-    ax2.text(1, max(c_pred, q_pred) * 1.5, f'{pred_speedup:.0f}x\nlangsamer',
-            ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
+    # Add speedup annotations (Classical is faster, so show how much slower Quantum is)
+    train_speedup = q_train / c_train if c_train > 0 and q_train > 0 else 0
+    pred_speedup = q_pred / c_pred if c_pred > 0 and q_pred > 0 else 0
+
+    if train_speedup > 0:
+        ax2.text(0, max(c_train, q_train) * 1.5, f'{train_speedup:.1f}x\nlangsamer',
+                ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
+    if pred_speedup > 0:
+        ax2.text(1, max(c_pred, q_pred) * 1.5, f'{pred_speedup:.1f}x\nlangsamer',
+                ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
 
     # 3. Metrics Heatmap
     comparison_data = np.array([
@@ -294,9 +297,9 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     • Klassisch hat höhere Präzision ({classical_metrics['precision']:.2%})
 
     EFFIZIENZ-GEWINNER: Klassisch
-    • Training: {train_speedup:.0f}x schneller
-    • Vorhersage: {pred_speedup:.0f}x schneller
-    • Gesamtzeit: Klassisch {c_train + c_pred:.2f}s vs Quantum {q_train + q_pred:.0f}s
+    • Training: Quantum {train_speedup:.1f}x langsamer
+    • Vorhersage: Quantum {pred_speedup:.1f}x langsamer
+    • Gesamtzeit: Klassisch {c_train + c_pred:.2f}s vs Quantum {q_train + q_pred:.2f}s
 
     FAZIT FÜR BI2-PROJEKT:
     Quantum SVM bietet marginale Leistungsverbesserungen
@@ -499,16 +502,18 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     # Training time
     c_train_time = c_metrics.get('training_time', 0)
     q_train_time = q_metrics.get('training_time', 0) + q_metrics.get('kernel_computation_time', 0)
-    train_speedup = q_train_time / c_train_time if c_train_time > 0 else 0
+    train_speedup = c_train_time / q_train_time if q_train_time > 0 else 0
     print(f"│ Training Time               │   {c_train_time:>7.4f}s       │  {q_train_time:>7.2f}s      │  Classical │")
-    print(f"│                             │                  │                  │  {train_speedup:.0f}x faster│")
+    if train_speedup > 0:
+        print(f"│                             │                  │                  │  {train_speedup:.1f}x faster│")
 
     # Prediction time
     c_pred_time = c_metrics.get('prediction_time', 0)
     q_pred_time = q_metrics.get('prediction_time', 0)
-    pred_speedup = q_pred_time / c_pred_time if c_pred_time > 0 else 0
+    pred_speedup = c_pred_time / q_pred_time if q_pred_time > 0 else 0
     print(f"│ Prediction Time             │   {c_pred_time:>7.4f}s       │  {q_pred_time:>7.2f}s      │  Classical │")
-    print(f"│                             │                  │                  │  {pred_speedup:.0f}x faster│")
+    if pred_speedup > 0:
+        print(f"│                             │                  │                  │  {pred_speedup:.1f}x faster│")
 
     print("└─────────────────────────────┴──────────────────┴──────────────────┴─────────┘")
 
@@ -519,18 +524,22 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     if c_metrics['f1_score'] > q_metrics['f1_score']:
         print("🏆 Winner: CLASSICAL SVM")
         print(f"   Classical achieves better balanced performance (F1: {c_metrics['f1_score']:.4f})")
-        print(f"   and is {train_speedup:.0f}x faster in training.")
+        if train_speedup > 0:
+            print(f"   and is {train_speedup:.1f}x faster in training.")
     elif q_metrics['f1_score'] > c_metrics['f1_score']:
         print("🏆 Winner: QUANTUM SVM")
         print(f"   Quantum achieves slightly better F1-score ({q_metrics['f1_score']:.4f} vs {c_metrics['f1_score']:.4f})")
-        print(f"   at the cost of {train_speedup:.0f}x longer training time.")
+        slowdown_factor = 1.0 / train_speedup if train_speedup > 0 else 0
+        if slowdown_factor > 0:
+            print(f"   at the cost of {slowdown_factor:.1f}x longer training time.")
     else:
         print("🏆 Result: TIE")
         print("   Both models achieve identical F1-scores.")
 
     print("\n💡 Key Findings:")
     print(f"   • Accuracy difference: {abs(c_metrics['accuracy'] - q_metrics['accuracy'])*100:.2f}% (minimal)")
-    print(f"   • Classical is significantly faster: {train_speedup:.0f}x training, {pred_speedup:.0f}x prediction")
+    if train_speedup > 0 and pred_speedup > 0:
+        print(f"   • Classical is significantly faster: {train_speedup:.1f}x training, {pred_speedup:.1f}x prediction")
     print(f"   • Quantum shows {'higher' if q_metrics['recall'] > c_metrics['recall'] else 'lower'} recall: {q_metrics['recall']:.2%} vs {c_metrics['recall']:.2%}")
     print(f"   • Classical shows {'higher' if c_metrics['precision'] > q_metrics['precision'] else 'lower'} precision: {c_metrics['precision']:.2%} vs {q_metrics['precision']:.2%}")
 
