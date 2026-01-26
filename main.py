@@ -499,21 +499,21 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     print("│                          COMPUTATIONAL EFFICIENCY                           │")
     print("├─────────────────────────────┬──────────────────┬──────────────────┬─────────┤")
 
-    # Training time
+    # Training time (show Quantum slowdown)
     c_train_time = c_metrics.get('training_time', 0)
     q_train_time = q_metrics.get('training_time', 0) + q_metrics.get('kernel_computation_time', 0)
-    train_speedup = c_train_time / q_train_time if q_train_time > 0 else 0
+    train_slowdown = q_train_time / c_train_time if c_train_time > 0 else 0
     print(f"│ Training Time               │   {c_train_time:>7.4f}s       │  {q_train_time:>7.2f}s      │  Classical │")
-    if train_speedup > 0:
-        print(f"│                             │                  │                  │  {train_speedup:.1f}x faster│")
+    if train_slowdown > 0:
+        print(f"│                             │                  │  Quantum {train_slowdown:.1f}x slower │         │")
 
-    # Prediction time
+    # Prediction time (show Quantum slowdown)
     c_pred_time = c_metrics.get('prediction_time', 0)
     q_pred_time = q_metrics.get('prediction_time', 0)
-    pred_speedup = c_pred_time / q_pred_time if q_pred_time > 0 else 0
+    pred_slowdown = q_pred_time / c_pred_time if c_pred_time > 0 else 0
     print(f"│ Prediction Time             │   {c_pred_time:>7.4f}s       │  {q_pred_time:>7.2f}s      │  Classical │")
-    if pred_speedup > 0:
-        print(f"│                             │                  │                  │  {pred_speedup:.1f}x faster│")
+    if pred_slowdown > 0:
+        print(f"│                             │                  │  Quantum {pred_slowdown:.1f}x slower │         │")
 
     print("└─────────────────────────────┴──────────────────┴──────────────────┴─────────┘")
 
@@ -524,22 +524,21 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     if c_metrics['f1_score'] > q_metrics['f1_score']:
         print("🏆 Winner: CLASSICAL SVM")
         print(f"   Classical achieves better balanced performance (F1: {c_metrics['f1_score']:.4f})")
-        if train_speedup > 0:
-            print(f"   and is {train_speedup:.1f}x faster in training.")
+        if train_slowdown > 0:
+            print(f"   and Quantum is {train_slowdown:.1f}x slower in training.")
     elif q_metrics['f1_score'] > c_metrics['f1_score']:
         print("🏆 Winner: QUANTUM SVM")
         print(f"   Quantum achieves slightly better F1-score ({q_metrics['f1_score']:.4f} vs {c_metrics['f1_score']:.4f})")
-        slowdown_factor = 1.0 / train_speedup if train_speedup > 0 else 0
-        if slowdown_factor > 0:
-            print(f"   at the cost of {slowdown_factor:.1f}x longer training time.")
+        if train_slowdown > 0:
+            print(f"   at the cost of {train_slowdown:.1f}x longer training time.")
     else:
         print("🏆 Result: TIE")
         print("   Both models achieve identical F1-scores.")
 
     print("\n💡 Key Findings:")
     print(f"   • Accuracy difference: {abs(c_metrics['accuracy'] - q_metrics['accuracy'])*100:.2f}% (minimal)")
-    if train_speedup > 0 and pred_speedup > 0:
-        print(f"   • Classical is significantly faster: {train_speedup:.1f}x training, {pred_speedup:.1f}x prediction")
+    if train_slowdown > 0 and pred_slowdown > 0:
+        print(f"   • Quantum is significantly slower: {train_slowdown:.1f}x training, {pred_slowdown:.1f}x prediction")
     print(f"   • Quantum shows {'higher' if q_metrics['recall'] > c_metrics['recall'] else 'lower'} recall: {q_metrics['recall']:.2%} vs {c_metrics['recall']:.2%}")
     print(f"   • Classical shows {'higher' if c_metrics['precision'] > q_metrics['precision'] else 'lower'} precision: {c_metrics['precision']:.2%} vs {q_metrics['precision']:.2%}")
 
