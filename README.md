@@ -538,12 +538,18 @@ pixi run python analysis.py
 
 # Fehleranalyse-Visualisierung generieren
 pixi run python create_error_analysis_plot.py
+
+# Visualisierungen aus gecachten Metriken neu generieren (ohne Re-Simulation)
+pixi run python regenerate_visualizations.py
 ```
 
 Ausgabedateien:
 - `results/thesis_summary_table.csv` - Fertig für Thesis-Tabellen
 - `results/confusion_matrix_comparison.csv` - Detaillierte Fehleraufschlüsselung
 - `results/error_analysis_comprehensive.png` - Publikationsqualität-Visualisierung
+- `results/comparison_metrics.json` - Gecachte Metriken für Visualisierungen
+
+**Hinweis:** Das `regenerate_visualizations.py` Skript lädt Metriken aus `results/comparison_metrics.json` und generiert Visualisierungen neu, ohne die zeitaufwendige Quantensimulation erneut auszuführen. Nützlich für Anpassungen an Plot-Ästhetik oder Text.
 
 ### Tests ausführen
 ```bash
