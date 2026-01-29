@@ -37,7 +37,7 @@
 
 ## Akademischer Kontext
 
-- **Kurs:** Business Intelligence 2, 6. Semester
+- **Kurs:** Business Intelligence II, 6. Semester
 - **Institution:** IU Internationale Hochschule
 - **Betreuer:** Dr. Stefan Nisch
 - **Student:** Gregor Kobilarov
@@ -465,7 +465,7 @@ Die umfassende Vergleichsübersicht enthält:
 - Leistungsmetriken-Balkendiagramm
 - Recheneffizienz-Vergleich (log. Skala)
 - Leistungs-Heatmap
-- Zusammenfassende Analyse für BI2-Projekt
+- Zusammenfassende Analyse für Business Intelligence II-Projekt
 
 #### ROC-Kurven-Vergleich
 
@@ -580,7 +580,3 @@ pixi run python src/classical_svm.py
 Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE)-Datei für Details.
 
 Dieses Projekt wurde zu Bildungszwecken als Teil eines Universitätskurses erstellt.
-
----
-
-**Status**: Experimentelle Phase abgeschlossen | 4-Qubit-Ergebnisse verfügbar | Dokumentations- und Analysephase

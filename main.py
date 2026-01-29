@@ -2,7 +2,7 @@
 """
 QML Credit Risk Benchmark - Main Execution Script
 
-This is the main entry point for the BI2 project comparing
+This is the main entry point for the Business Intelligence II project comparing
 Quantum SVM (QSVM) with Classical SVM on credit risk data.
 
 Usage:
@@ -190,7 +190,7 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
         n_test: Number of test samples used
     """
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
-    fig.suptitle('Klassisch vs. Quantum SVM: Umfassender Vergleich\nBI2-Projekt - German Credit Risk Datensatz',
+    fig.suptitle('Klassisch vs. Quantum SVM: Umfassender Vergleich\nBusiness Intelligence II-Projekt - German Credit Risk Datensatz',
                  fontsize=16, fontweight='bold', y=0.98)
 
     # 1. Performance Metrics Comparison (Bar Chart)
@@ -302,7 +302,7 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     • Vorhersage: Quantum {pred_speedup:.1f}x langsamer
     • Gesamtzeit: Klassisch {c_train + c_pred:.4f}s vs Quantum {q_train + q_pred:.2f}s
 
-    FAZIT FÜR BI2-PROJEKT:
+    FAZIT FÜR BUSINESS INTELLIGENCE II-PROJEKT:
     Quantum SVM zeigt messbare Performance-Vorteile: {(quantum_metrics['f1_score'] - classical_metrics['f1_score'])*100:.2f}%
     F1-Verbesserung und {(quantum_metrics['recall'] - classical_metrics['recall'])*100:.2f}% höherer Recall
     (bessere Erkennung guter Kreditnehmer).
@@ -313,7 +313,7 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     komplexeren Problemen könnte das Verhältnis günstiger ausfallen.
 
     Erstellt: {Path(__file__).parent.name}
-    Student: Gregor Kobilarov | Kurs: BI2 | Semester: 6
+    Student: Gregor Kobilarov | Kurs: Business Intelligence II | Semester: 6
     """
 
     ax4.text(0.05, 0.95, summary_text, transform=ax4.transAxes,
@@ -544,7 +544,7 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     print(f"   • Quantum shows {'higher' if q_metrics['recall'] > c_metrics['recall'] else 'lower'} recall: {q_metrics['recall']:.2%} vs {c_metrics['recall']:.2%}")
     print(f"   • Classical shows {'higher' if c_metrics['precision'] > q_metrics['precision'] else 'lower'} precision: {c_metrics['precision']:.2%} vs {q_metrics['precision']:.2%}")
 
-    print("\n🔬 Conclusion for BI2 Project:")
+    print("\n🔬 Conclusion for Business Intelligence II Project:")
     print(f"   Quantum SVM shows measurable performance advantages ({(q_metrics['f1_score'] - c_metrics['f1_score'])*100:.2f}% F1 improvement,")
     print(f"   {(q_metrics['recall'] - c_metrics['recall'])*100:.2f}% higher recall), but at ~{train_slowdown:.0f}x longer computation time.")
     print("   For this credit risk problem, the marginal accuracy gain does not justify the")
@@ -596,7 +596,7 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description='QML Credit Risk Benchmark - BI2 Project',
+        description='QML Credit Risk Benchmark - Business Intelligence II Project',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
