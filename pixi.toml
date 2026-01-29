@@ -4,7 +4,7 @@
 [workspace]
 name = "qml-credit-risk-benchmark"
 version = "0.1.0"
-description = "Empirical comparison of Quantum vs Classical SVMs on credit risk data (BI2 Project)"
+description = "Empirical comparison of Quantum vs Classical SVMs on credit risk data (Business Intelligence II Project)"
 authors = ["Gregor Kobilarov"]
 # Specify which platforms this project supports (add more if needed)
 channels = ["conda-forge"]  # conda-forge has pre-built binaries for scientific packages

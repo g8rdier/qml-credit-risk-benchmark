@@ -2,7 +2,7 @@
 """
 QML Credit Risk Benchmark - Main Execution Script
 
-This is the main entry point for the BI2 project comparing
+This is the main entry point for the Business Intelligence II project comparing
 Quantum SVM (QSVM) with Classical SVM on credit risk data.
 
 Usage:
@@ -191,7 +191,7 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
         n_test: Number of test samples used
     """
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
-    fig.suptitle('Classical vs Quantum SVM: Comprehensive Comparison\nBI2 Project - German Credit Risk Dataset',
+    fig.suptitle('Classical vs Quantum SVM: Comprehensive Comparison\nBusiness Intelligence II Project - German Credit Risk Dataset',
                  fontsize=16, fontweight='bold', y=0.98)
 
     # 1. Performance Metrics Comparison (Bar Chart)
@@ -244,13 +244,17 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     ax2.set_yscale('log')
     ax2.grid(axis='y', alpha=0.3, linestyle='--', which='both')
 
-    # Add speedup annotations
-    train_speedup = q_train / c_train if c_train > 0 else 0
-    pred_speedup = q_pred / c_pred if c_pred > 0 else 0
-    ax2.text(0, max(c_train, q_train) * 1.5, f'{train_speedup:.0f}x\nslower',
-            ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
-    ax2.text(1, max(c_pred, q_pred) * 1.5, f'{pred_speedup:.0f}x\nslower',
-            ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
+    # Add speedup annotations (Classical is faster, so show how much slower Quantum is)
+    # Place labels next to Quantum bars for better visibility
+    train_speedup = q_train / c_train if c_train > 0 and q_train > 0 else 0
+    pred_speedup = q_pred / c_pred if c_pred > 0 and q_pred > 0 else 0
+
+    if train_speedup > 0:
+        ax2.text(-0.15, q_train * 0.5, f'{train_speedup:.1f}x\nslower',
+                ha='right', va='center', fontsize=10, fontweight='bold', color='#e74c3c')
+    if pred_speedup > 0:
+        ax2.text(0.85, q_pred * 0.5, f'{pred_speedup:.1f}x\nslower',
+                ha='right', va='center', fontsize=10, fontweight='bold', color='#e74c3c')
 
     # 3. Metrics Heatmap
     comparison_data = np.array([
@@ -295,21 +299,22 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     • Classical has higher precision ({classical_metrics['precision']:.2%})
 
     EFFICIENCY WINNER: Classical
-    • Training: {train_speedup:.0f}x faster
-    • Prediction: {pred_speedup:.0f}x faster
-    • Total time: Classical {c_train + c_pred:.2f}s vs Quantum {q_train + q_pred:.0f}s
+    • Training: Quantum {train_speedup:.1f}x slower
+    • Prediction: Quantum {pred_speedup:.1f}x slower
+    • Total time: Classical {c_train + c_pred:.4f}s vs Quantum {q_train + q_pred:.2f}s
 
-    CONCLUSION FOR BI2 PROJECT:
-    Quantum SVM provides marginal performance gains
-    ({(quantum_metrics['f1_score'] - classical_metrics['f1_score'])*100:.1f}% F1-score improvement) but at
-    exponential computational cost ({train_speedup:.0f}x slower).
+    CONCLUSION FOR BUSINESS INTELLIGENCE II PROJECT:
+    Quantum SVM shows measurable performance advantages: {(quantum_metrics['f1_score'] - classical_metrics['f1_score'])*100:.2f}%
+    F1 improvement and {(quantum_metrics['recall'] - classical_metrics['recall'])*100:.2f}% higher recall
+    (better detection of good credit applicants).
 
-    Quantum simulation overhead makes it impractical
-    for production use with current technology.
-    Real quantum hardware may change this trajectory.
+    However, at ~{train_speedup:.0f}x longer computation time. For this
+    credit risk problem, the marginal accuracy advantage is technically
+    not worth the exponentially higher computational cost. For larger,
+    more complex problems, the trade-off might be more favorable.
 
     Generated: {Path(__file__).parent.name}
-    Student: Gregor Kobilarov | Course: BI2 | Semester: 6
+    Student: Gregor Kobilarov | Course: Business Intelligence II | Semester: 6
     """
 
     ax4.text(0.05, 0.95, summary_text, transform=ax4.transAxes,
@@ -531,9 +536,12 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
     print(f"   • Quantum shows {'higher' if q_metrics['recall'] > c_metrics['recall'] else 'lower'} recall: {q_metrics['recall']:.2%} vs {c_metrics['recall']:.2%}")
     print(f"   • Classical shows {'higher' if c_metrics['precision'] > q_metrics['precision'] else 'lower'} precision: {c_metrics['precision']:.2%} vs {q_metrics['precision']:.2%}")
 
-    print("\n🔬 Conclusion for BI2 Project:")
-    print("   Quantum SVM simulation overhead makes it impractical for current use cases.")
-    print("   Real quantum hardware may change this, but simulators don't provide advantages.")
+    print("\n🔬 Conclusion for Business Intelligence II Project:")
+    print(f"   Quantum SVM shows measurable performance advantages ({(q_metrics['f1_score'] - c_metrics['f1_score'])*100:.2f}% F1 improvement,")
+    print(f"   {(q_metrics['recall'] - c_metrics['recall'])*100:.2f}% higher recall), but at ~{train_slowdown:.0f}x longer computation time.")
+    print("   For this credit risk problem, the marginal accuracy gain does not justify the")
+    print("   exponentially higher computational cost. At larger, more complex problems, the")
+    print("   trade-off might be more favorable.")
     print("="*80)
 
     # Generate comparison visualizations
@@ -559,11 +567,28 @@ def run_comparison(n_components: int = 4, subset_size: int = None) -> None:
         quantum_results['X_train']
     )
 
+    # Save metrics to JSON for future visualization regeneration
+    import json
+    metrics_data = {
+        'classical': c_metrics,
+        'quantum': q_metrics,
+        'dataset': {
+            'n_train': n_train,
+            'n_test': n_test,
+            'n_components': quantum_results['model'].n_qubits
+        }
+    }
+    metrics_path = Path("results/comparison_metrics.json")
+    metrics_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(metrics_path, 'w') as f:
+        json.dump(metrics_data, f, indent=2)
+    print(f"\n💾 Saved metrics to: {metrics_path}")
+
 
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description='QML Credit Risk Benchmark - BI2 Project',
+        description='QML Credit Risk Benchmark - Business Intelligence II Project',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

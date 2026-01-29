@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Deep Analysis Script for BI2 Thesis
+Deep Analysis Script for Business Intelligence II Thesis
 Generates detailed comparison tables and business impact analysis
 """
 
@@ -327,7 +327,7 @@ def create_summary_table():
 def main():
     """Run complete analysis."""
     print("\n" + "="*80)
-    print("BI2 PROJECT - DEEP ANALYSIS FOR THESIS")
+    print("BUSINESS INTELLIGENCE II PROJECT - DEEP ANALYSIS FOR THESIS")
     print("Quantum vs Classical SVM Credit Risk Classification")
     print("="*80)
 
