@@ -20,7 +20,7 @@ def create_error_analysis_plot():
     fig = plt.figure(figsize=(16, 10))
     gs = fig.add_gridspec(2, 3, hspace=0.3, wspace=0.3)
 
-    fig.suptitle('Error Pattern Analysis: Classical vs Quantum SVM\nBI2 Project - Credit Risk Classification',
+    fig.suptitle('Error Pattern Analysis: Classical vs Quantum SVM\nBusiness Intelligence II Project - Credit Risk Classification',
                  fontsize=16, fontweight='bold', y=0.98)
 
     # 1. Error Types Comparison (Bar Chart)

@@ -37,7 +37,7 @@
 
 ## Academic Context
 
-- **Course:** Business Intelligence 2, 6th Semester
+- **Course:** Business Intelligence II, 6th Semester
 - **Institution:** IU International University of Applied Sciences
 - **Supervisor:** Dr. Stefan Nisch
 - **Student:** Gregor Kobilarov
@@ -415,9 +415,9 @@ The project tracks the following metrics for comparison:
 
 | Operation | Classical SVM | Quantum SVM | Speedup |
 |-----------|---------------|-------------|---------|
-| **Training** | 0.04s | 396.26s | Classical 9,894x faster |
-| **Prediction** | 0.003s | 266.13s | Classical 90,551x faster |
-| **Total Time** | 0.04s | 662.38s | Classical 15,415x faster |
+| **Training** | 0.041s | 385.95s | Classical 9,413x faster |
+| **Prediction** | 0.003s | 252.97s | Classical 81,603x faster |
+| **Total Time** | 0.044s | 638.92s | Classical 14,498x faster |
 
 **Methodology Note:** Quantum timing results reflect first-run performance without kernel caching. The quantum implementation includes a caching mechanism for kernel matrices (stored in `data/processed/`), which can speed up repeated experiments with identical parameters. However, all reported benchmarks use fresh kernel computation to ensure fair comparison with classical methods and represent realistic first-run performance.
 
@@ -425,15 +425,15 @@ The project tracks the following metrics for comparison:
 
 **Hypothesis Testing Results:**
 
-- **H0₁ (Performance)**: REJECTED - Quantum achieves marginally better F1-score (0.8239 vs 0.8000, +2.4% improvement), though difference is small and may not be statistically significant without repeated trials
-- **H0₂ (Computational Efficiency)**: REJECTED - Quantum is 15,415x slower (662s vs 0.04s), strongly supporting H1₂
+- **H0₁ (Performance)**: REJECTED - Quantum achieves marginally better F1-score (0.8239 vs 0.8000, +2.99% improvement), though difference is small and may not be statistically significant without repeated trials
+- **H0₂ (Computational Efficiency)**: REJECTED - Quantum is 14,498x slower (638.92s vs 0.044s), strongly supporting H1₂
 - **Overall**: Expected outcome validated - similar accuracy (~0.5% difference) but exponentially higher computational cost
 
 **Detailed Results:**
 
-- **Performance**: Quantum achieves marginally better F1-score (2.4% improvement)
+- **Performance**: Quantum achieves marginally better F1-score (2.99% improvement)
 - **Accuracy**: Near-identical performance validates hypothesis (~0.5% difference)
-- **Computational Cost**: Quantum is 15,415x slower due to simulation overhead
+- **Computational Cost**: Quantum is 14,498x slower due to simulation overhead
 - **Practical Conclusion**: Quantum simulation provides no practical advantage for production use
 
 **Trade-offs:**
@@ -465,7 +465,7 @@ The comprehensive comparison includes:
 - Performance metrics bar chart
 - Computational efficiency comparison (log scale)
 - Performance heatmap
-- Summary analysis for BI2 project
+- Summary analysis for Business Intelligence II project
 
 #### ROC Curve Comparison
 
@@ -562,12 +562,18 @@ pixi run python analysis.py
 
 # Generate error analysis visualization
 pixi run python create_error_analysis_plot.py
+
+# Regenerate visualizations from cached metrics (without re-simulation)
+pixi run python regenerate_visualizations.py
 ```
 
 Output files:
 - `results/thesis_summary_table.csv` - Ready for thesis tables
 - `results/confusion_matrix_comparison.csv` - Detailed error breakdown
 - `results/error_analysis_comprehensive.png` - Publication-quality visualization
+- `results/comparison_metrics.json` - Cached metrics for visualizations
+
+**Note:** The `regenerate_visualizations.py` script loads metrics from `results/comparison_metrics.json` and regenerates visualizations without re-running the time-consuming quantum simulation. Useful for adjusting plot aesthetics or text.
 
 ### Running Tests
 ```bash
@@ -598,7 +604,3 @@ pixi run python src/classical_svm.py
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 This project was created for educational purposes as part of a university course.
-
----
-
-**Status**: Experimental Phase Complete | 4-Qubit Results Available | Documentation & Analysis Phase
