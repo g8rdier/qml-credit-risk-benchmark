@@ -50,11 +50,11 @@ def create_error_analysis_plot():
             ax1.text(bar.get_x() + bar.get_width()/2., height,
                     f'{int(height)}', ha='center', va='bottom', fontweight='bold')
 
-    # Add annotations
+    # Add annotations - place labels next to bars
     ax1.text(0, max(classical_errors[0], quantum_errors[0]) * 1.2,
              f'90% Reduktion', ha='center', fontsize=10, color='green', fontweight='bold')
-    ax1.text(1, max(classical_errors[1], quantum_errors[1]) * 1.1,
-             f'43% Erhöhung', ha='center', fontsize=10, color='orange', fontweight='bold')
+    ax1.text(0.95, classical_errors[1] * 1.2, f'43% Erhöhung',
+             ha='right', va='center', fontsize=10, color='orange', fontweight='bold')
 
     # 2. Business Cost Impact
     ax2 = fig.add_subplot(gs[0, 1])
@@ -95,10 +95,10 @@ def create_error_analysis_plot():
              ha='center', fontweight='bold', fontsize=10)
 
     savings_pct = (classical_total - quantum_total) / classical_total * 100
-    ax2.text(0.5, max(classical_total, quantum_total) * 1.15,
-             f'73% Kostenreduktion', ha='center', fontsize=11,
-             color='green', fontweight='bold',
-             bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.5))
+    ax2.text(1, quantum_total * 0.5, f'73% Kostenreduktion\ndurch Quantum',
+             ha='center', va='center', fontsize=9,
+             color='green', fontweight='bold', zorder=10,
+             bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.85))
 
     # 3. Error Rates Comparison
     ax3 = fig.add_subplot(gs[0, 2])
@@ -180,7 +180,7 @@ def create_error_analysis_plot():
     # 5. Risk Profile Radar Chart (Bottom Right)
     ax5 = fig.add_subplot(gs[1, 2], projection='polar')
 
-    categories = ['Recall\n(Sensitivität)', 'Präzision', 'Spezifität',
+    categories = ['                Recall\n            (Sensitivität)', 'Präzision', 'Spezifität',
                   'F1-Wert', 'NPV']
 
     # Calculate metrics

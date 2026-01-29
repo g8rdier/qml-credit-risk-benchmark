@@ -415,9 +415,9 @@ Das Projekt verfolgt die folgenden Metriken zum Vergleich:
 
 | Operation | Klassische SVM | Quantum SVM | Speedup |
 |-----------|----------------|-------------|---------|
-| **Training** | 0,048s | 382,23s | Klassisch 7.963x schneller |
-| **Vorhersage** | 0,003s | 257,97s | Klassisch 85.990x schneller |
-| **Gesamtzeit** | 0,051s | 640,20s | Klassisch 12.553x schneller |
+| **Training** | 0,041s | 385,95s | Klassisch 9.413x schneller |
+| **Vorhersage** | 0,003s | 252,97s | Klassisch 81.603x schneller |
+| **Gesamtzeit** | 0,044s | 638,92s | Klassisch 14.498x schneller |
 
 **Methodischer Hinweis:** Die Quantum-Zeitmessungen spiegeln die Erstlauf-Leistung ohne Kernel-Caching wider. Die Quantum-Implementierung enthält einen Caching-Mechanismus für Kernel-Matrizen (gespeichert in `data/processed/`), der wiederholte Experimente mit identischen Parametern beschleunigen kann. Alle berichteten Benchmarks verwenden jedoch frische Kernel-Berechnungen, um einen fairen Vergleich mit klassischen Methoden zu gewährleisten.
 
@@ -425,15 +425,15 @@ Das Projekt verfolgt die folgenden Metriken zum Vergleich:
 
 **Hypothesentest-Ergebnisse:**
 
-- **H0₁ (Leistung)**: ABGELEHNT - Quantum erreicht marginal besseren F1-Wert (0,8239 vs. 0,8000, +2,4% Verbesserung), obwohl der Unterschied klein ist und ohne wiederholte Versuche möglicherweise nicht statistisch signifikant ist
-- **H0₂ (Recheneffizienz)**: ABGELEHNT - Quantum ist 12.553x langsamer (640s vs. 0,05s), was H1₂ stark unterstützt
+- **H0₁ (Leistung)**: ABGELEHNT - Quantum erreicht marginal besseren F1-Wert (0,8239 vs. 0,8000, +2,99% Verbesserung), obwohl der Unterschied klein ist und ohne wiederholte Versuche möglicherweise nicht statistisch signifikant ist
+- **H0₂ (Recheneffizienz)**: ABGELEHNT - Quantum ist 14.498x langsamer (638,92s vs. 0,044s), was H1₂ stark unterstützt
 - **Gesamt**: Erwartetes Ergebnis bestätigt - ähnliche Genauigkeit (~0,5% Unterschied) aber exponentiell höhere Rechenkosten
 
 **Detaillierte Ergebnisse:**
 
-- **Leistung**: Quantum erreicht marginal besseren F1-Wert (2,4% Verbesserung)
+- **Leistung**: Quantum erreicht marginal besseren F1-Wert (2,99% Verbesserung)
 - **Genauigkeit**: Nahezu identische Leistung bestätigt Hypothese (~0,5% Unterschied)
-- **Rechenkosten**: Quantum ist 12.553x langsamer aufgrund des Simulations-Overheads
+- **Rechenkosten**: Quantum ist 14.498x langsamer aufgrund des Simulations-Overheads
 - **Praktische Schlussfolgerung**: Quantensimulation bietet keinen praktischen Vorteil für den Produktionseinsatz
 
 **Trade-offs:**

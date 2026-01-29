@@ -244,15 +244,16 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     ax2.grid(axis='y', alpha=0.3, linestyle='--', which='both')
 
     # Add speedup annotations (Classical is faster, so show how much slower Quantum is)
+    # Place labels next to Quantum bars for better visibility
     train_speedup = q_train / c_train if c_train > 0 and q_train > 0 else 0
     pred_speedup = q_pred / c_pred if c_pred > 0 and q_pred > 0 else 0
 
     if train_speedup > 0:
-        ax2.text(0, max(c_train, q_train) * 1.5, f'{train_speedup:.1f}x\nlangsamer',
-                ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
+        ax2.text(-0.15, q_train * 0.5, f'{train_speedup:.1f}x\nlangsamer',
+                ha='right', va='center', fontsize=10, fontweight='bold', color='#e74c3c')
     if pred_speedup > 0:
-        ax2.text(1, max(c_pred, q_pred) * 1.5, f'{pred_speedup:.1f}x\nlangsamer',
-                ha='center', va='bottom', fontsize=10, fontweight='bold', color='#e74c3c')
+        ax2.text(0.85, q_pred * 0.5, f'{pred_speedup:.1f}x\nlangsamer',
+                ha='right', va='center', fontsize=10, fontweight='bold', color='#e74c3c')
 
     # 3. Metrics Heatmap
     comparison_data = np.array([
@@ -287,7 +288,7 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
     {'='*50}
 
     Datensatz: German Credit Risk (OpenML)
-    Stichproben: {total_samples} ({n_train} Training / {n_test} Test)
+    Samples: {total_samples} ({n_train} Training / {n_test} Test)
     Merkmale: 48 → {quantum_metrics.get('n_qubits', 4)} (PCA, {quantum_metrics.get('n_qubits', 4)} Qubits)
 
     LEISTUNGS-GEWINNER: {'Quantum' if quantum_metrics['f1_score'] > classical_metrics['f1_score'] else 'Klassisch' if classical_metrics['f1_score'] > quantum_metrics['f1_score'] else 'Unentschieden'}
@@ -308,7 +309,7 @@ def create_comparison_visualization(classical_metrics: dict, quantum_metrics: di
 
     Jedoch bei ~{train_speedup:.0f}x längerer Rechenzeit. Für dieses
     Kreditrisiko-Problem ist der marginale Genauigkeitsvorteil
-    die exponentiell höheren Rechenkosten nicht wert. Bei größeren,
+    die exponentiell höheren Rechenkosten technisch nicht wert. Bei größeren,
     komplexeren Problemen könnte das Verhältnis günstiger ausfallen.
 
     Erstellt: {Path(__file__).parent.name}
